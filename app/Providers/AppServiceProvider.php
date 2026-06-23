@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Ensure router has the `role` middleware alias (Laravel 13+)
+        $this->app->router->aliasMiddleware('role', \App\Http\Middleware\RoleMiddleware::class);
     }
 }

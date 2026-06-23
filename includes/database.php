@@ -24,21 +24,33 @@ function load_env($path)
 
 $env = load_env(__DIR__ . '/../.env');
 
-$host = $env['DB_HOST'] ?? '127.0.0.1';
-$db   = $env['DB_NAME'] ?? 'database';
-$user = $env['DB_USER'] ?? 'root';
-$pass = $env['DB_PASS'] ?? '';
-$charset = $env['DB_CHARSET'] ?? 'utf8mb4';
-
-$dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES => false,
-];
+$connection = $env['DB_CONNECTION'] ?? ($env['DB_CONNECTION'] ?? 'mysql');
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
+    if ($connection === 'sqlite') {
+        $dbPath = $env['DB_DATABASE'] ?? (__DIR__ . '/../database/database.sqlite');
+        // if relative path, make it absolute
+        if (!preg_match('#^([A-Za-z]:)?[/\\]#', $dbPath)) {
+            $dbPath = __DIR__ . '/../' . ltrim($dbPath, '/\\');
+        }
+        $dsn = "sqlite:" . $dbPath;
+        $pdo = new PDO($dsn);
+    } else {
+        $host = $env['DB_HOST'] ?? '127.0.0.1';
+        $db   = $env['DB_DATABASE'] ?? ($env['DB_NAME'] ?? 'database');
+        $user = $env['DB_USERNAME'] ?? ($env['DB_USER'] ?? 'root');
+        $pass = $env['DB_PASSWORD'] ?? ($env['DB_PASS'] ?? '');
+        $charset = $env['DB_CHARSET'] ?? 'utf8mb4';
+
+        $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
+
+        $pdo = new PDO($dsn, $user, $pass, $options);
+    }
 } catch (PDOException $e) {
     throw new RuntimeException('Database connection failed: ' . $e->getMessage());
 }
