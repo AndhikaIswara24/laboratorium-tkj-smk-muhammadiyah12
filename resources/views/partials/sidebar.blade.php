@@ -1,38 +1,69 @@
-<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-gray-800 text-gray-100 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40">
-  <div class="h-full overflow-y-auto">
-    <div class="px-4 py-6">
-      <nav class="space-y-1">
-        @if(Route::has('dashboard'))
-          <a href="{{ route('dashboard') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Dashboard</a>
-        @endif
-        @if(Route::has('assets.index'))
-          <a href="{{ route('assets.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('assets.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Data Aset</a>
-        @endif
-        @if(Route::has('kondisi.index'))
-          <a href="{{ route('kondisi.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('kondisi.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Kondisi Fisik</a>
-        @endif
-        @if(Route::has('pemeliharaan.index'))
-          <a href="{{ route('pemeliharaan.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('pemeliharaan.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Pemeliharaan</a>
-        @endif
-        @if(Route::has('efisiensi.index'))
-          <a href="{{ route('efisiensi.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('efisiensi.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Efisiensi</a>
-        @endif
-        @if(Route::has('variabel.index'))
-          <a href="{{ route('variabel.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('variabel.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Variabel Eksternal</a>
-        @endif
-        @if(Route::has('prediksi.index'))
-          <a href="{{ route('prediksi.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('prediksi.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Prediksi Naive Bayes</a>
-        @endif
-        @if(Route::has('laporan.index'))
-          <a href="{{ route('laporan.index') }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('laporan.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Laporan</a>
-        @endif
-          @if(auth()->check() && auth()->user()->role === 'admin')
-            <a href="{{ route('admin.users.index') }}" class="block rounded-md px-3 py-2 mt-3 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'bg-gray-900' : 'hover:bg-gray-700' }}">Users</a>
-          @endif
-      </nav>
+@php
+    $navGroups = [
+        'Overview' => [
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'fa-chart-line'],
+        ],
+        'Asset Intelligence' => [
+            ['label' => 'Data Aset', 'route' => 'assets.index', 'match' => 'assets.*', 'icon' => 'fa-boxes-stacked'],
+            ['label' => 'Kondisi Fisik', 'route' => 'kondisi.index', 'match' => 'kondisi.*', 'icon' => 'fa-stethoscope'],
+            ['label' => 'Pemeliharaan', 'route' => 'pemeliharaan.index', 'match' => 'pemeliharaan.*', 'icon' => 'fa-screwdriver-wrench'],
+            ['label' => 'Efisiensi', 'route' => 'efisiensi.index', 'match' => 'efisiensi.*', 'icon' => 'fa-gauge-high'],
+            ['label' => 'Variabel Eksternal', 'route' => 'variabel.index', 'match' => 'variabel.*', 'icon' => 'fa-sliders'],
+        ],
+        'Analitik' => [
+            ['label' => 'Prediksi Naive Bayes', 'route' => 'prediksi.index', 'match' => 'prediksi.*', 'icon' => 'fa-brain'],
+            ['label' => 'Laporan', 'route' => 'laporan.index', 'match' => 'laporan.*', 'icon' => 'fa-file-export'],
+        ],
+    ];
+@endphp
+
+<aside id="sidebar" class="fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-72 -translate-x-full border-r border-slate-200 bg-white transition-all duration-300 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-950">
+    <div class="flex h-full flex-col">
+        <div class="border-b border-slate-200 p-4 dark:border-slate-800">
+            <div class="rounded-lg bg-slate-100 p-4 dark:bg-slate-900">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Model Status</p>
+                <div class="mt-3 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-lg font-bold text-slate-950 dark:text-white">94.8%</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Akurasi Naive Bayes</p>
+                    </div>
+                    <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">Live</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+            @foreach($navGroups as $group => $items)
+                <div>
+                    <p class="sidebar-label px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">{{ $group }}</p>
+                    <div class="space-y-1">
+                        @foreach($items as $item)
+                            @if(Route::has($item['route']) && ($item['route'] !== 'variabel.index' || auth()->user()->role === 'admin') && (!in_array($item['route'], ['prediksi.index', 'laporan.index']) || auth()->user()->role === 'admin'))
+                                <a href="{{ route($item['route']) }}" class="sidebar-link group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs($item['match']) ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white' }}">
+                                    <i class="fa-solid {{ $item['icon'] }} w-5 text-center"></i>
+                                    <span class="sidebar-text">{{ $item['label'] }}</span>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+
+            @if(auth()->check() && auth()->user()->role === 'admin')
+                <div>
+                    <p class="sidebar-label px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">Administrasi</p>
+                    <a href="{{ route('admin.users.index') }}" class="sidebar-link group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white' }}">
+                        <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                        <span class="sidebar-text">Manajemen User</span>
+                    </a>
+                </div>
+            @endif
+        </nav>
+
+        <div class="border-t border-slate-200 p-4 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+            <p class="sidebar-text">&copy; 2026 SMK Muhammadiyah 12</p>
+        </div>
     </div>
-  </div>
 </aside>
 
-<!-- overlay for mobile when sidebar open -->
-<div id="sidebarBackdrop" class="fixed inset-0 bg-black opacity-25 hidden z-30 md:hidden"></div>
+<div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-slate-950/60 backdrop-blur-sm lg:hidden"></div>

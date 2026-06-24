@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
+    }
+
+    .form-control {
+        @apply rounded-lg border-slate-200 bg-white text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100;
+    }
+
+    .skeleton {
+        @apply animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800;
+    }
+
+    .sidebar-collapsed #sidebar {
+        @apply lg:w-24;
+    }
+
+    .sidebar-collapsed #dashboardMain {
+        @apply lg:pl-24;
+    }
+
+    .sidebar-collapsed .sidebar-text,
+    .sidebar-collapsed .sidebar-label {
+        @apply lg:hidden;
+    }
+
+    .sidebar-collapsed .sidebar-link {
+        @apply lg:justify-center;
+    }
+}
