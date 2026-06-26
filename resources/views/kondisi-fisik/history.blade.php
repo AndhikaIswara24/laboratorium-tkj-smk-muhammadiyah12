@@ -1,0 +1,328 @@
+@extends('layouts.app')
+@section('title', 'Riwayat Kondisi Aset')
+@section('content')
+
+<div class="space-y-6">
+    {{-- Breadcrumb --}}
+    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <a href="{{ route('kondisi.index') }}" class="transition hover:text-blue-600 dark:hover:text-blue-400">
+            <i class="fa-solid fa-stethoscope mr-1"></i>Kondisi Fisik
+        </a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 dark:text-slate-600"></i>
+        <span class="font-medium text-slate-700 dark:text-slate-200">Riwayat Observasi</span>
+    </nav>
+
+    {{-- Page Header --}}
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+                <i class="fa-solid fa-clock-rotate-left mr-2 text-blue-600"></i>Riwayat Observasi Aset
+            </h1>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Lacak seluruh catatan kondisi fisik dan teknis historis untuk aset ini.
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ route('kondisi.index') }}" class="btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar
+            </a>
+            <a href="{{ route('kondisi.create', ['id_aset' => $asset->id_aset]) }}" class="btn-primary">
+                <i class="fa-solid fa-plus"></i> Tambah Observasi
+            </a>
+        </div>
+    </div>
+
+    {{-- Success Alert --}}
+    @if ($message = Session::get('success'))
+        <div class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200" x-data="{ show: true }" x-show="show" x-transition>
+            <i class="fa-solid fa-check-circle text-lg"></i>
+            <span class="flex-1 text-sm font-medium">{{ $message }}</span>
+            <button @click="show = false" class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-100">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    @endif
+
+    {{-- Asset Detail Card --}}
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        {{-- Card Header --}}
+        <div class="border-b border-slate-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+                    <i class="fa-solid fa-cube text-lg text-white"></i>
+                </span>
+                <div>
+                    <h2 class="text-base font-bold text-white">{{ $asset->nama_brg }}</h2>
+                    <p class="text-xs text-blue-100">Kode Aset: <span class="font-mono font-bold">{{ $asset->kode_brg }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Card Body --}}
+        <div class="p-6">
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {{-- Detail 1: Merk/Tipe --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Merk / Tipe</p>
+                    <p class="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">{{ $asset->merk_tipe ?? '—' }}</p>
+                </div>
+
+                {{-- Detail 2: Lokasi --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Lokasi / Lab</p>
+                    <p class="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                        <i class="fa-solid fa-location-dot mr-1 text-rose-500"></i>{{ $asset->lokasi ?? '—' }}
+                    </p>
+                </div>
+
+                {{-- Detail 3: Tahun & Usia Pakai --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Tahun & Usia Pakai</p>
+                    @php
+                        $usia = $asset->thn_perolehan ? (int)date('Y') - (int)$asset->thn_perolehan : null;
+                    @endphp
+                    <p class="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {{ $asset->thn_perolehan ?? '—' }}
+                        @if($usia !== null)
+                            <span class="text-xs font-normal text-slate-500">({{ $usia }} tahun)</span>
+                        @endif
+                    </p>
+                </div>
+
+                {{-- Detail 4: Harga Perolehan --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Harga Perolehan</p>
+                    <p class="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {{ $asset->harga_perolehan ? 'Rp ' . number_format($asset->harga_perolehan, 0, ',', '.') : '—' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 grid gap-6 md:grid-cols-2">
+                {{-- Detail 5: Asal Usul --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Asal Usul / Sumber Dana</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{{ $asset->asal_usul ?? '—' }}</p>
+                </div>
+
+                {{-- Detail 6: Spesifikasi --}}
+                <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/40">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Spesifikasi Lengkap</p>
+                    <p class="mt-1 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{{ $asset->spesifikasi ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- History List --}}
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h3 class="mb-4 text-base font-bold text-slate-900 dark:text-white">
+            <i class="fa-solid fa-list-ul mr-2 text-blue-600"></i>Daftar Riwayat Observasi
+        </h3>
+
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">#</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Tgl Observasi</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Kondisi Barang</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Ket. Teknis</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Usia Pakai</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Frq Kerusakan</th>
+                            <th class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">Kelas Label</th>
+                            <th class="px-4 py-3 text-center font-semibold text-slate-600 dark:text-slate-300">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($rows as $row)
+                            <tr class="transition hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <td class="px-4 py-3 text-slate-500">
+                                    {{ ($rows->currentPage()-1) * $rows->perPage() + $loop->iteration }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                                        <i class="fa-regular fa-calendar text-xs text-slate-400"></i>
+                                        {{ $row->tgl_observasi ? $row->tgl_observasi->format('d M Y') : '-' }}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @php
+                                        $kondisiClass = match($row->kondisi_brg) {
+                                            'B' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30',
+                                            'RR' => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30',
+                                            'RB' => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-500/30',
+                                            default => 'bg-slate-50 text-slate-700 ring-slate-600/20'
+                                        };
+                                        $kondisiLabel = match($row->kondisi_brg) {
+                                            'B' => 'Baik',
+                                            'RR' => 'Rusak Ringan',
+                                            'RB' => 'Rusak Berat',
+                                            default => $row->kondisi_brg
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset {{ $kondisiClass }}">
+                                        {{ $kondisiLabel }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @php
+                                        $teknisClass = match($row->ket_teknis) {
+                                            'Normal' => 'text-emerald-600 dark:text-emerald-400',
+                                            'Lemah' => 'text-amber-600 dark:text-amber-400',
+                                            'Lambat' => 'text-orange-600 dark:text-orange-400',
+                                            'Mati Total' => 'text-rose-600 dark:text-rose-400',
+                                            default => 'text-slate-500'
+                                        };
+                                        $teknisIcon = match($row->ket_teknis) {
+                                            'Normal' => 'fa-circle-check',
+                                            'Lemah' => 'fa-battery-half',
+                                            'Lambat' => 'fa-gauge-simple',
+                                            'Mati Total' => 'fa-power-off',
+                                            default => 'fa-question'
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1 text-xs font-semibold {{ $teknisClass }}">
+                                        <i class="fa-solid {{ $teknisIcon }}"></i>
+                                        {{ $row->ket_teknis ?? '-' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ $row->usia_pakai ?? 0 }}</span>
+                                    <span class="text-xs text-slate-400"> tahun</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full {{ ($row->frq_kerusakan ?? 0) > 3 ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' }} text-xs font-bold">
+                                        {{ $row->frq_kerusakan ?? 0 }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @php
+                                        $labelClass = match($row->kelas_label) {
+                                            'Layak' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300',
+                                            'Perlu Servis' => 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300',
+                                            'Tidak Layak' => 'bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-300',
+                                            default => 'bg-slate-100 text-slate-700'
+                                        };
+                                        $labelIcon = match($row->kelas_label) {
+                                            'Layak' => 'fa-thumbs-up',
+                                            'Perlu Servis' => 'fa-tools',
+                                            'Tidak Layak' => 'fa-ban',
+                                            default => 'fa-question'
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold {{ $labelClass }}">
+                                        <i class="fa-solid {{ $labelIcon }} text-[10px]"></i>
+                                        {{ $row->kelas_label }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="inline-flex items-center gap-1">
+                                        <a href="{{ route('kondisi.edit', $row->id_kondisi) }}" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-500/10 dark:hover:text-amber-400" title="Edit">
+                                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                        </a>
+                                        <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                                                onclick="openDeleteModal({{ $row->id_kondisi }})" title="Hapus">
+                                            <i class="fa-solid fa-trash-can text-sm"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-4 py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+                                            <i class="fa-solid fa-clipboard-question text-2xl text-slate-300 dark:text-slate-600"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-semibold text-slate-600 dark:text-slate-300">Belum ada riwayat observasi</p>
+                                            <p class="text-sm text-slate-400">Klik "Tambah Observasi" untuk mencatat kondisi fisik pertama aset ini.</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($rows->count())
+                <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-800 dark:bg-slate-800/50 mt-4 rounded-b-xl">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">
+                        Menampilkan {{ $rows->firstItem() }} - {{ $rows->lastItem() }} dari {{ $rows->total() }} data
+                    </span>
+                    {{ $rows->links('pagination::tailwind') }}
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+{{-- Delete Confirmation Modal --}}
+<div id="deleteModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm" style="display:none;">
+    <div class="w-full max-w-md animate-[fadeInScale_0.2s_ease-out] rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <div class="mb-4 flex items-center gap-3">
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </span>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Konfirmasi Hapus</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+        </div>
+        <p class="mb-6 text-sm text-slate-600 dark:text-slate-300">
+            Apakah Anda yakin ingin menghapus data observasi terpilih untuk aset <strong class="text-slate-900 dark:text-white">{{ $asset->nama_brg }}</strong>?
+        </p>
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="btn-secondary">Batal</button>
+            <form id="deleteForm" method="POST" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push('head')
+<style>
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    function openDeleteModal(id) {
+        document.getElementById('deleteForm').action = '/kondisi-fisik/' + id;
+        const modal = document.getElementById('deleteModal');
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDeleteModal();
+    });
+</script>
+@endpush
+
+@endsection

@@ -107,16 +107,30 @@
                                     <span class="badge {{ $badgeClass }}">{{ $item->asal_usul }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('assets.edit', $item->id_aset) }}" 
-                                       class="btn btn-sm btn-warning" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-id="{{ $item->id_aset }}" data-name="{{ $item->nama_brg }}"
-                                            title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="{{ route('kondisi.history', $item->id_aset) }}" 
+                                           class="btn btn-sm btn-info text-white" title="Riwayat Kondisi Fisik">
+                                            <i class="fas fa-stethoscope"></i>
+                                        </a>
+                                        <a href="{{ route('pemeliharaan.history', $item->id_aset) }}" 
+                                           class="btn btn-sm btn-success text-white" title="Riwayat Pemeliharaan">
+                                            <i class="fas fa-screwdriver-wrench"></i>
+                                        </a>
+                                        <a href="{{ route('efisiensi.history', $item->id_aset) }}" 
+                                           class="btn btn-sm btn-primary text-white" title="Riwayat Efisiensi Output">
+                                            <i class="fas fa-gauge-high"></i>
+                                        </a>
+                                        <a href="{{ route('assets.edit', $item->id_aset) }}" 
+                                           class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                data-id="{{ $item->id_aset }}" data-name="{{ $item->nama_brg }}"
+                                                title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

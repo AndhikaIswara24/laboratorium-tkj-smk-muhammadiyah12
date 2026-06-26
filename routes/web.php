@@ -29,13 +29,38 @@ Route::middleware(['auth'])->group(function () {
          ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
     // Kondisi Fisik - teknisi and admin
-    Route::get('/kondisi-fisik', [KondisiFisikController::class, 'index'])->name('kondisi.index')->middleware('role:admin|teknisi');
+    Route::middleware('role:admin|teknisi')->group(function () {
+        Route::get('/kondisi-fisik', [KondisiFisikController::class, 'index'])->name('kondisi.index');
+        Route::get('/kondisi-fisik/create', [KondisiFisikController::class, 'create'])->name('kondisi.create');
+        Route::post('/kondisi-fisik', [KondisiFisikController::class, 'store'])->name('kondisi.store');
+        Route::get('/kondisi-fisik/{id}/edit', [KondisiFisikController::class, 'edit'])->name('kondisi.edit');
+        Route::put('/kondisi-fisik/{id}', [KondisiFisikController::class, 'update'])->name('kondisi.update');
+        Route::delete('/kondisi-fisik/{id}', [KondisiFisikController::class, 'destroy'])->name('kondisi.destroy');
+        Route::get('/kondisi-fisik/history/{idAset}', [KondisiFisikController::class, 'history'])->name('kondisi.history');
+        Route::get('/kondisi-fisik/asset-data/{id}', [KondisiFisikController::class, 'getAssetData'])->name('kondisi.asset-data');
+    });
 
     // Pemeliharaan - teknisi and admin
-    Route::get('/pemeliharaan', [PemeliharaanController::class, 'index'])->name('pemeliharaan.index')->middleware('role:admin|teknisi');
+    Route::middleware('role:admin|teknisi')->group(function () {
+        Route::get('/pemeliharaan', [PemeliharaanController::class, 'index'])->name('pemeliharaan.index');
+        Route::get('/pemeliharaan/create', [PemeliharaanController::class, 'create'])->name('pemeliharaan.create');
+        Route::post('/pemeliharaan', [PemeliharaanController::class, 'store'])->name('pemeliharaan.store');
+        Route::get('/pemeliharaan/{id}/edit', [PemeliharaanController::class, 'edit'])->name('pemeliharaan.edit');
+        Route::put('/pemeliharaan/{id}', [PemeliharaanController::class, 'update'])->name('pemeliharaan.update');
+        Route::delete('/pemeliharaan/{id}', [PemeliharaanController::class, 'destroy'])->name('pemeliharaan.destroy');
+        Route::get('/pemeliharaan/history/{idAset}', [PemeliharaanController::class, 'history'])->name('pemeliharaan.history');
+    });
 
     // Efisiensi - admin and teknisi
-    Route::get('/efisiensi', [EfisiensiController::class, 'index'])->name('efisiensi.index')->middleware('role:admin|teknisi');
+    Route::middleware('role:admin|teknisi')->group(function () {
+        Route::get('/efisiensi', [EfisiensiController::class, 'index'])->name('efisiensi.index');
+        Route::get('/efisiensi/create', [EfisiensiController::class, 'create'])->name('efisiensi.create');
+        Route::post('/efisiensi', [EfisiensiController::class, 'store'])->name('efisiensi.store');
+        Route::get('/efisiensi/{id}/edit', [EfisiensiController::class, 'edit'])->name('efisiensi.edit');
+        Route::put('/efisiensi/{id}', [EfisiensiController::class, 'update'])->name('efisiensi.update');
+        Route::delete('/efisiensi/{id}', [EfisiensiController::class, 'destroy'])->name('efisiensi.destroy');
+        Route::get('/efisiensi/history/{idAset}', [EfisiensiController::class, 'history'])->name('efisiensi.history');
+    });
 
     // Variabel eksternal - admin
     Route::get('/variabel-eksternal', [VariabelEksternalController::class, 'index'])->name('variabel.index')->middleware('role:admin');
