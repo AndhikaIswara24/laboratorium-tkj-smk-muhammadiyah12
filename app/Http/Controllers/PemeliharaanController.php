@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pemeliharaan;
 use App\Models\Asset;
+use App\Traits\CanExportData;
 
 class PemeliharaanController extends Controller
 {
+    use CanExportData;
     /**
      * Daftar semua data pemeliharaan dengan search & filter.
      */
@@ -128,5 +130,59 @@ class PemeliharaanController extends Controller
                     ->paginate(20);
 
         return view('pemeliharaan.history', compact('asset', 'rows'));
+    }
+
+    /**
+     * Export data to CSV.
+     */
+    public function exportCsv()
+    {
+        $rows = Pemeliharaan::with('asset')->orderBy('tgl_pm', 'desc')->get();
+        $headers = ['ID Pemeliharaan', 'Kode Aset', 'Nama Aset', 'Tanggal PM', 'Jenis PM', 'Interval (Bulan)', 'Pelaksana', 'Biaya Servis', 'Kondisi Sesudah', 'Keterangan'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_pm,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_pm ? $row->tgl_pm->format('Y-m-d') : '-',
+                $row->jenis_pm,
+                $row->interval_bulan,
+                $row->pelaksana,
+                $row->biaya_servis,
+                $row->kon_after,
+                $row->ket_pm,
+            ];
+        }
+
+        return $this->exportToCsv('riwayat-pemeliharaan-' . date('Y-m-d'), $headers, $data);
+    }
+
+    /**
+     * Export data to Excel (XLS).
+     */
+    public function exportExcel()
+    {
+        $rows = Pemeliharaan::with('asset')->orderBy('tgl_pm', 'desc')->get();
+        $headers = ['ID Pemeliharaan', 'Kode Aset', 'Nama Aset', 'Tanggal PM', 'Jenis PM', 'Interval (Bulan)', 'Pelaksana', 'Biaya Servis', 'Kondisi Sesudah', 'Keterangan'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_pm,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_pm ? $row->tgl_pm->format('Y-m-d') : '-',
+                $row->jenis_pm,
+                $row->interval_bulan,
+                $row->pelaksana,
+                $row->biaya_servis,
+                $row->kon_after,
+                $row->ket_pm,
+            ];
+        }
+
+        return $this->exportToExcel('riwayat-pemeliharaan-' . date('Y-m-d'), 'Riwayat Pemeliharaan Aset', $headers, $data);
     }
 }

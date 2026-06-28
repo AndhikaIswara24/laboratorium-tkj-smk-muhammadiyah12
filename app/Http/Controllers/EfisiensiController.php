@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Efisiensi;
 use App\Models\Asset;
+use App\Traits\CanExportData;
 
 class EfisiensiController extends Controller
 {
+    use CanExportData;
     /**
      * Daftar semua data efisiensi dengan search & filter.
      */
@@ -135,5 +137,61 @@ class EfisiensiController extends Controller
                     ->paginate(20);
 
         return view('efisiensi.history', compact('asset', 'rows'));
+    }
+
+    /**
+     * Export data to CSV.
+     */
+    public function exportCsv()
+    {
+        $rows = Efisiensi::with('asset')->orderBy('tgl_observasi', 'desc')->get();
+        $headers = ['ID Efisiensi', 'Kode Aset', 'Nama Aset', 'Tanggal Observasi', 'Jam Ops', 'Penggunaan', 'Jml User', 'Downtime', 'Performa', 'Umur Ekonomis', 'Efisiensi Output'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_efisiensi,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_observasi ? $row->tgl_observasi->format('Y-m-d') : '-',
+                $row->jam_ops,
+                $row->penggunaan,
+                $row->jml_user,
+                $row->downtime,
+                $row->perform,
+                $row->umur_ekonomis,
+                $row->efi_out,
+            ];
+        }
+
+        return $this->exportToCsv('riwayat-efisiensi-' . date('Y-m-d'), $headers, $data);
+    }
+
+    /**
+     * Export data to Excel (XLS).
+     */
+    public function exportExcel()
+    {
+        $rows = Efisiensi::with('asset')->orderBy('tgl_observasi', 'desc')->get();
+        $headers = ['ID Efisiensi', 'Kode Aset', 'Nama Aset', 'Tanggal Observasi', 'Jam Ops', 'Penggunaan', 'Jml User', 'Downtime', 'Performa', 'Umur Ekonomis', 'Efisiensi Output'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_efisiensi,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_observasi ? $row->tgl_observasi->format('Y-m-d') : '-',
+                $row->jam_ops,
+                $row->penggunaan,
+                $row->jml_user,
+                $row->downtime,
+                $row->perform,
+                $row->umur_ekonomis,
+                $row->efi_out,
+            ];
+        }
+
+        return $this->exportToExcel('riwayat-efisiensi-' . date('Y-m-d'), 'Riwayat Efisiensi Output Aset', $headers, $data);
     }
 }

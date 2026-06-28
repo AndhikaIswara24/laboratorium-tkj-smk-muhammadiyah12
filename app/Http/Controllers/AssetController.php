@@ -28,7 +28,15 @@ class AssetController extends Controller
 
         $items = $query->latest('created_at')->paginate(15);
 
-        return view('assets.index', compact('items', 'search', 'filter_asal'));
+        // Fetch distribution of Asal Usul for Chart.js
+        $distribAsal = [
+            'Pembelian' => Asset::where('asal_usul', 'Pembelian')->count(),
+            'Hibah' => Asset::where('asal_usul', 'Hibah')->count(),
+            'Dropping Dinas' => Asset::where('asal_usul', 'Dropping Dinas')->count(),
+            'Dana BOS' => Asset::where('asal_usul', 'Dana BOS')->count(),
+        ];
+
+        return view('assets.index', compact('items', 'search', 'filter_asal', 'distribAsal'));
     }
 
     public function create()
@@ -87,6 +95,96 @@ class AssetController extends Controller
 
         return redirect()->route('assets.index')
                         ->with('success', 'Aset berhasil dihapus!');
+    }
+
+    /**
+     * Import assets from uploaded CSV file.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->getRealPath();
+
+        // Native CSV reading
+        if (($handle = fopen($path, 'r')) !== FALSE) {
+            // Read header
+            $header = fgetcsv($handle, 1000, ',');
+            if (!$header) {
+                return redirect()->route('assets.index')->with('error', 'File CSV kosong.');
+            }
+
+            // Normalize header names (lowercase, remove spaces)
+            $header = array_map(function($h) {
+                return strtolower(trim(str_replace([' ', '_'], '', $h)));
+            }, $header);
+
+            $successCount = 0;
+            $errorCount = 0;
+            $errors = [];
+
+            while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                // Skip empty rows
+                if (empty($data) || count($data) < 2) continue;
+
+                // Map header to values
+                $row = array_combine(array_intersect_key($header, $data), array_intersect_key($data, $header));
+                
+                // Fallback map if header mapping fails
+                $kode_brg = $row['kodebarang'] ?? $row['kodebrg'] ?? $data[0] ?? null;
+                $nama_brg = $row['namabarang'] ?? $row['namabrg'] ?? $data[1] ?? null;
+                $merk_tipe = $row['merktipe'] ?? $data[2] ?? null;
+                $spesifikasi = $row['spesifikasi'] ?? $data[3] ?? null;
+                $lokasi = $row['lokasi'] ?? $data[4] ?? null;
+                $thn_perolehan = $row['tahunperolehan'] ?? $row['thnperolehan'] ?? $data[5] ?? null;
+                $harga_perolehan = $row['hargaperolehan'] ?? $data[6] ?? null;
+                $asal_usul = $row['asalusul'] ?? $data[7] ?? 'Pembelian';
+
+                if (!$kode_brg || !$nama_brg) {
+                    $errorCount++;
+                    $errors[] = "Baris dengan data kosong dilewati.";
+                    continue;
+                }
+
+                // Clean and normalize input
+                $asal_usul = trim($asal_usul);
+                $asal_usul = in_array($asal_usul, ['Pembelian', 'Hibah', 'Dropping Dinas', 'Dana BOS']) ? $asal_usul : 'Pembelian';
+                $harga_perolehan = is_numeric($harga_perolehan) ? $harga_perolehan : null;
+                $thn_perolehan = is_numeric($thn_perolehan) && strlen($thn_perolehan) == 4 ? $thn_perolehan : null;
+
+                try {
+                    Asset::updateOrCreate(
+                        ['kode_brg' => trim($kode_brg)],
+                        [
+                            'nama_brg' => trim($nama_brg),
+                            'merk_tipe' => $merk_tipe ? trim($merk_tipe) : null,
+                            'spesifikasi' => $spesifikasi ? trim($spesifikasi) : null,
+                            'lokasi' => $lokasi ? trim($lokasi) : null,
+                            'thn_perolehan' => $thn_perolehan,
+                            'harga_perolehan' => $harga_perolehan,
+                            'asal_usul' => $asal_usul
+                        ]
+                    );
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errorCount++;
+                    $errors[] = "Gagal menyimpan kode " . $kode_brg . ": " . $e->getMessage();
+                }
+            }
+            fclose($handle);
+
+            $msg = "Berhasil mengimpor {$successCount} aset.";
+            if ($errorCount > 0) {
+                $msg .= " Gagal {$errorCount} baris. Detail: " . implode(', ', array_slice($errors, 0, 3));
+            }
+
+            return redirect()->route('assets.index')->with('success', $msg);
+        }
+
+        return redirect()->route('assets.index')->with('error', 'Gagal membaca file CSV.');
     }
 }
 

@@ -4,24 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class VariabelEksternal extends Model
+class NaiveBayesDataset extends Model
 {
-    protected $table = 't_variabel_eksternal';
-    protected $primaryKey = 'id_eksternal';
+    protected $table = 't_naive_bayes_dataset';
+    protected $primaryKey = 'id_dataset';
     public $timestamps = false;
 
     protected $fillable = [
         'id_aset',
-        'tgl_observasi',
+        'kondisi_brg',
+        'usia_pakai',
+        'frq_kerusakan',
+        'jenis_pm',
+        'interval_pm',
+        'efi_out',
+        'downtime',
         'lingkungan',
         'daya_listrik',
         'sparepart',
-        'anggaran',
-        'ext_effect',
-    ];
-
-    protected $casts = [
-        'tgl_observasi' => 'date',
+        'kelas_label',
+        'tgl_input',
     ];
 
     public function asset()

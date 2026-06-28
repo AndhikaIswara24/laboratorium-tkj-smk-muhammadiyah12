@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\KondisiFisik;
 use App\Models\Asset;
+use App\Traits\CanExportData;
 
 class KondisiFisikController extends Controller
 {
+    use CanExportData;
     /**
      * Daftar semua data kondisi fisik dengan filter dan search.
      */
@@ -155,5 +157,57 @@ class KondisiFisikController extends Controller
             'thn_perolehan' => $asset->thn_perolehan,
             'usia_pakai' => $usiaPakai,
         ]);
+    }
+
+    /**
+     * Export data to CSV.
+     */
+    public function exportCsv()
+    {
+        $rows = KondisiFisik::with('asset')->latest('tgl_observasi')->get();
+        $headers = ['ID Kondisi', 'Kode Aset', 'Nama Aset', 'Tanggal Observasi', 'Kondisi Barang', 'Keterangan Teknis', 'Usia Pakai', 'Frekuensi Kerusakan', 'Kelas Label'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_kondisi,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_observasi ? $row->tgl_observasi->format('Y-m-d') : '-',
+                $row->kondisi_brg,
+                $row->ket_teknis,
+                $row->usia_pakai,
+                $row->frq_kerusakan,
+                $row->kelas_label,
+            ];
+        }
+
+        return $this->exportToCsv('riwayat-kondisi-fisik-' . date('Y-m-d'), $headers, $data);
+    }
+
+    /**
+     * Export data to Excel (XLS).
+     */
+    public function exportExcel()
+    {
+        $rows = KondisiFisik::with('asset')->latest('tgl_observasi')->get();
+        $headers = ['ID Kondisi', 'Kode Aset', 'Nama Aset', 'Tanggal Observasi', 'Kondisi Barang', 'Keterangan Teknis', 'Usia Pakai', 'Frekuensi Kerusakan', 'Kelas Label'];
+        
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = [
+                $row->id_kondisi,
+                $row->asset->kode_brg ?? '-',
+                $row->asset->nama_brg ?? '-',
+                $row->tgl_observasi ? $row->tgl_observasi->format('Y-m-d') : '-',
+                $row->kondisi_brg,
+                $row->ket_teknis,
+                $row->usia_pakai,
+                $row->frq_kerusakan,
+                $row->kelas_label,
+            ];
+        }
+
+        return $this->exportToExcel('riwayat-kondisi-fisik-' . date('Y-m-d'), 'Riwayat Kondisi Fisik & Teknis Aset', $headers, $data);
     }
 }

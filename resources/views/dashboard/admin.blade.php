@@ -22,105 +22,111 @@
         </div>
     @endif
 
+    {{-- Main Metrics --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-dashboard.metric-card label="Total Asset" value="1,240" hint="Semua aset terdaftar" icon="fa-boxes-stacked" tone="blue" trend="+8.4%" />
-        <x-dashboard.metric-card label="Asset Layak" value="1,089" hint="Probabilitas layak tinggi" icon="fa-circle-check" tone="green" trend="87.8%" />
-        <x-dashboard.metric-card label="Asset Tidak Layak" value="151" hint="Butuh tindakan teknisi" icon="fa-triangle-exclamation" tone="red" trend="12.2%" />
+        <x-dashboard.metric-card label="Total Asset" value="{{ $totalAssets }}" hint="Semua aset terdaftar" icon="fa-boxes-stacked" tone="blue" trend="" />
+        <x-dashboard.metric-card label="Asset Layak" value="{{ $distribKondisi['Layak'] }}" hint="Probabilitas layak tinggi" icon="fa-circle-check" tone="green" trend="" />
+        <x-dashboard.metric-card label="Asset Tidak Layak" value="{{ $distribKondisi['Tidak Layak'] }}" hint="Butuh tindakan teknisi" icon="fa-triangle-exclamation" tone="red" trend="" />
         <x-dashboard.metric-card label="Akurasi Model" value="94.8%" hint="Validasi dataset terakhir" icon="fa-brain" tone="violet" trend="+2.1%" />
     </div>
 
+    {{-- Historical Table Row Metrics --}}
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h3 class="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <i class="fa-solid fa-database mr-1"></i> Data Riwayat Historis (Jumlah Baris)
+        </h3>
+        <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/40">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Kondisi Fisik</span>
+                <p class="mt-1 text-xl font-bold text-slate-800 dark:text-slate-200">{{ $countKondisi }} <span class="text-xs font-normal text-slate-500">baris</span></p>
+            </div>
+            <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/40">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pemeliharaan</span>
+                <p class="mt-1 text-xl font-bold text-slate-800 dark:text-slate-200">{{ $countPemeliharaan }} <span class="text-xs font-normal text-slate-500">baris</span></p>
+            </div>
+            <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/40">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Efisiensi Output</span>
+                <p class="mt-1 text-xl font-bold text-slate-800 dark:text-slate-200">{{ $countEfisiensi }} <span class="text-xs font-normal text-slate-500">baris</span></p>
+            </div>
+            <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-800/40">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Variabel Eksternal</span>
+                <p class="mt-1 text-xl font-bold text-slate-800 dark:text-slate-200">{{ $countVariabel }} <span class="text-xs font-normal text-slate-500">baris</span></p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Charts Section --}}
     <div class="grid gap-6 xl:grid-cols-3">
         <x-dashboard.panel title="Grafik Prediksi" subtitle="Perbandingan output layak dan tidak layak per bulan" icon="fa-chart-line" class="xl:col-span-2">
             <div class="h-80"><canvas id="predictionChart"></canvas></div>
         </x-dashboard.panel>
 
-        <x-dashboard.panel title="Kondisi Asset" subtitle="Distribusi kondisi fisik terkini" icon="fa-chart-pie">
+        <x-dashboard.panel title="Distribusi Label Kelas" subtitle="Distribusi kelas kondisi kelayakan saat ini" icon="fa-chart-pie">
             <div class="h-72"><canvas id="conditionChart"></canvas></div>
             <div class="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-                <div class="rounded-lg bg-emerald-50 p-3 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"><b class="block text-lg">72%</b>Baik</div>
-                <div class="rounded-lg bg-amber-50 p-3 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"><b class="block text-lg">16%</b>Perawatan</div>
-                <div class="rounded-lg bg-rose-50 p-3 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"><b class="block text-lg">12%</b>Rusak</div>
+                <div class="rounded-lg bg-emerald-50 p-3 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                    <b class="block text-base">{{ $distribKondisi['Layak'] }}</b>Layak
+                </div>
+                <div class="rounded-lg bg-amber-50 p-3 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                    <b class="block text-base">{{ $distribKondisi['Perlu Servis'] }}</b>Servis
+                </div>
+                <div class="rounded-lg bg-rose-50 p-3 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                    <b class="block text-base">{{ $distribKondisi['Tidak Layak'] }}</b>Tidak Layak
+                </div>
             </div>
         </x-dashboard.panel>
     </div>
 
+    {{-- Completion Indicators & Data Progress --}}
     <div class="grid gap-6 xl:grid-cols-3">
-        <x-dashboard.panel title="Aktivitas Terbaru" subtitle="Log operasional sistem dan user" icon="fa-clock-rotate-left">
-            <div class="space-y-4">
-                @foreach([
-                    ['icon' => 'fa-plus', 'title' => 'Aset baru ditambahkan', 'meta' => 'Printer HP LaserJet oleh Admin', 'time' => '2 jam lalu', 'tone' => 'blue'],
-                    ['icon' => 'fa-screwdriver-wrench', 'title' => 'Maintenance selesai', 'meta' => 'PC Lab 1 selesai dibersihkan', 'time' => '5 jam lalu', 'tone' => 'green'],
-                    ['icon' => 'fa-brain', 'title' => 'Prediksi dijalankan', 'meta' => '24 aset dianalisis ulang', 'time' => 'Kemarin', 'tone' => 'violet'],
-                ] as $activity)
-                    <div class="flex gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-blue-600 shadow-sm dark:bg-slate-900 dark:text-blue-300"><i class="fa-solid {{ $activity['icon'] }}"></i></span>
-                        <div class="min-w-0">
-                            <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ $activity['title'] }}</p>
-                            <p class="truncate text-xs text-slate-500 dark:text-slate-400">{{ $activity['meta'] }}</p>
-                            <p class="mt-1 text-xs text-slate-400">{{ $activity['time'] }}</p>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </x-dashboard.panel>
-
-        <x-dashboard.panel title="Asset Terbaru" subtitle="Inventaris terakhir masuk" icon="fa-box-open" class="xl:col-span-2">
+        <x-dashboard.panel title="Kelengkapan Data per Aset" subtitle="Aset yang belum memiliki data lengkap di 4 tabel historis" icon="fa-list-check" class="xl:col-span-2">
             <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                     <thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
                         <tr>
                             <th class="px-4 py-3">Kode</th>
                             <th class="px-4 py-3">Nama Aset</th>
-                            <th class="px-4 py-3">Lokasi</th>
-                            <th class="px-4 py-3">Prediksi</th>
-                            <th class="px-4 py-3">Probabilitas</th>
+                            <th class="px-4 py-3">Progress</th>
+                            <th class="px-4 py-3">Kekurangan Data</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                        @foreach([
-                            ['kode' => 'LAB-PC-024', 'nama' => 'PC Rakitan Core i5', 'lokasi' => 'Lab TKJ 1', 'prediksi' => 'Layak', 'prob' => '96%'],
-                            ['kode' => 'PRN-008', 'nama' => 'Printer LaserJet', 'lokasi' => 'Ruang Guru', 'prediksi' => 'Perawatan', 'prob' => '68%'],
-                            ['kode' => 'RTR-014', 'nama' => 'Router MikroTik', 'lokasi' => 'Lab Jaringan', 'prediksi' => 'Layak', 'prob' => '91%'],
-                        ] as $asset)
-                            <tr class="bg-white transition hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/60">
-                                <td class="px-4 py-3 font-semibold text-blue-600 dark:text-blue-300">{{ $asset['kode'] }}</td>
-                                <td class="px-4 py-3 text-slate-900 dark:text-white">{{ $asset['nama'] }}</td>
-                                <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{ $asset['lokasi'] }}</td>
-                                <td class="px-4 py-3"><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{{ $asset['prediksi'] }}</span></td>
-                                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $asset['prob'] }}</td>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                        @forelse(collect($incompleteAssets)->take(6) as $item)
+                            <tr class="transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                                <td class="px-4 py-3 font-semibold text-blue-600 dark:text-blue-300">{{ $item['kode_brg'] }}</td>
+                                <td class="px-4 py-3 text-slate-900 dark:text-white truncate max-w-[150px]">{{ $item['nama_brg'] }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-2 w-16 rounded-full bg-slate-100 dark:bg-slate-800">
+                                            <div class="h-2 rounded-full @if($item['score'] == 3) bg-blue-500 @elseif($item['score'] == 2) bg-amber-500 @else bg-rose-500 @endif" style="width: {{ ($item['score'] / 4) * 100 }}%"></div>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ ($item['score'] / 4) * 100 }}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach($item['missing'] as $miss)
+                                            <span class="rounded bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                                                {{ $miss }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-2"></i>
+                                    <p class="text-sm font-semibold">Semua aset telah memiliki data lengkap di 4 tabel historis!</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </x-dashboard.panel>
-    </div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <x-dashboard.panel title="Reminder Maintenance" subtitle="Aset yang perlu perawatan" icon="fa-calendar-check">
-            <div class="space-y-3">
-                <div class="skeleton h-4 w-2/3"></div>
-                <div class="skeleton h-4 w-full"></div>
-                <div class="skeleton h-4 w-4/5"></div>
-            </div>
-            <div class="mt-5 space-y-3">
-                <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">UPS Server - jatuh tempo 26 Juni 2026</div>
-                <div class="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">Projector Lab 2 - perlu inspeksi lampu</div>
-            </div>
-        </x-dashboard.panel>
-
-        <x-dashboard.panel title="Ranking Efisiensi" subtitle="Aset paling efisien" icon="fa-ranking-star">
-            <div class="space-y-3">
-                @foreach(['Router Core' => 98, 'PC Lab 1-03' => 94, 'Switch Manageable' => 89] as $name => $score)
-                    <div>
-                        <div class="mb-1 flex justify-between text-sm"><span class="font-medium text-slate-700 dark:text-slate-200">{{ $name }}</span><span>{{ $score }}%</span></div>
-                        <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800"><div class="h-2 rounded-full bg-blue-600" style="width: {{ $score }}%"></div></div>
-                    </div>
-                @endforeach
-            </div>
-        </x-dashboard.panel>
-
-        <x-dashboard.panel title="Variabel Eksternal" subtitle="Faktor dominan kelayakan" icon="fa-bullseye">
+        <x-dashboard.panel title="Faktor Eksternal Terbesar" subtitle="Variabel eksternal dengan pengaruh tertinggi" icon="fa-bullseye">
             <div class="h-64"><canvas id="radarChart"></canvas></div>
         </x-dashboard.panel>
     </div>
@@ -147,7 +153,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     new Chart(document.getElementById('conditionChart'), {
         type: 'doughnut',
-        data: { labels: ['Baik', 'Perawatan', 'Rusak'], datasets: [{ data: [72, 16, 12], backgroundColor: ['#10b981', '#f59e0b', '#e11d48'], borderWidth: 0 }] },
+        data: { 
+            labels: ['Layak', 'Perlu Servis', 'Tidak Layak'], 
+            datasets: [{ 
+                data: [{{ $distribKondisi['Layak'] }}, {{ $distribKondisi['Perlu Servis'] }}, {{ $distribKondisi['Tidak Layak'] }}], 
+                backgroundColor: ['#10b981', '#f59e0b', '#e11d48'], 
+                borderWidth: 0 
+            }] 
+        },
         options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom' } } }
     });
 

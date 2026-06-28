@@ -1,181 +1,174 @@
 @extends('layouts.app')
-@section('title','Tambah Aset')
+@section('title', 'Tambah Aset Baru')
 @section('content')
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-plus-circle"></i> Tambah Data Aset Baru
-                    </h5>
+<div class="space-y-6">
+    {{-- Breadcrumb --}}
+    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <a href="{{ route('assets.index') }}" class="transition hover:text-blue-600 dark:hover:text-blue-400">
+            <i class="fa-solid fa-boxes-stacked mr-1"></i>Data Aset
+        </a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 dark:text-slate-600"></i>
+        <span class="font-medium text-slate-700 dark:text-slate-200">Tambah Aset Baru</span>
+    </nav>
+
+    {{-- Form Card --}}
+    <div class="mx-auto max-w-4xl">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            {{-- Card Header --}}
+            <div class="border-b border-slate-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+                        <i class="fa-solid fa-plus-circle text-lg text-white"></i>
+                    </span>
+                    <div>
+                        <h1 class="text-lg font-bold text-white">Tambah Data Aset Baru</h1>
+                        <p class="text-sm text-blue-100">Daftarkan inventaris aset laboratorium TKJ baru ke dalam sistem</p>
+                    </div>
                 </div>
+            </div>
 
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-exclamation-circle"></i> Terdapat Kesalahan!
-                            </h6>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {{-- Card Body --}}
+            <div class="p-6">
+                {{-- Error Alert --}}
+                @if ($errors->any())
+                    <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-500/20 dark:bg-rose-500/10">
+                        <div class="flex items-center gap-2 text-sm font-semibold text-rose-800 dark:text-rose-200">
+                            <i class="fa-solid fa-circle-exclamation"></i> Terdapat Kesalahan!
                         </div>
-                    @endif
+                        <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-rose-700 dark:text-rose-300">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                    <form action="{{ route('assets.store') }}" method="POST" enctype="multipart/form-data" id="formAset">
-                        @csrf
+                <form action="{{ route('assets.store') }}" method="POST" id="formAset">
+                    @csrf
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="kode_brg" class="form-label">
-                                        <i class="fas fa-barcode"></i> Kode Barang <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control @error('kode_brg') is-invalid @enderror" 
-                                           id="kode_brg" name="kode_brg" 
-                                           placeholder="Misal: AST-001" maxlength="20"
-                                           value="{{ old('kode_brg') }}" required>
-                                    <small class="form-text text-muted">Kode unik untuk identifikasi barang</small>
-                                    @error('kode_brg')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                    {{-- Section 1: Identifikasi Aset --}}
+                    <div class="mb-8">
+                        <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            <span class="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-xs text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">1</span>
+                            Identifikasi Aset
+                        </h3>
+
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            {{-- Kode Barang --}}
+                            <div>
+                                <label for="kode_brg" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-barcode mr-1 text-blue-500"></i> Kode Barang <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" id="kode_brg" name="kode_brg" required maxlength="20"
+                                       value="{{ old('kode_brg') }}" placeholder="Misal: AST-001"
+                                       class="form-control w-full py-2.5 @error('kode_brg') !border-rose-400 !ring-rose-400 @enderror">
+                                <p class="mt-1 text-xs text-slate-400">Kode barang unik untuk pelacakan inventaris.</p>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="nama_brg" class="form-label">
-                                        <i class="fas fa-cube"></i> Nama Barang <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control @error('nama_brg') is-invalid @enderror" 
-                                           id="nama_brg" name="nama_brg" 
-                                           placeholder="Misal: Printer HP LaserJet" maxlength="100"
-                                           value="{{ old('nama_brg') }}" required>
-                                    @error('nama_brg')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="merk_tipe" class="form-label">
-                                        <i class="fas fa-tag"></i> Merk / Tipe
-                                    </label>
-                                    <input type="text" class="form-control @error('merk_tipe') is-invalid @enderror" 
-                                           id="merk_tipe" name="merk_tipe" 
-                                           placeholder="Misal: HP P3015" maxlength="80"
-                                           value="{{ old('merk_tipe') }}">
-                                    @error('merk_tipe')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            {{-- Nama Barang --}}
+                            <div>
+                                <label for="nama_brg" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-cube mr-1 text-blue-500"></i> Nama Barang <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" id="nama_brg" name="nama_brg" required maxlength="100"
+                                       value="{{ old('nama_brg') }}" placeholder="Misal: Printer HP LaserJet"
+                                       class="form-control w-full py-2.5 @error('nama_brg') !border-rose-400 !ring-rose-400 @enderror">
+                                <p class="mt-1 text-xs text-slate-400">Nama deskriptif barang aset.</p>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="lokasi" class="form-label">
-                                        <i class="fas fa-map-marker-alt"></i> Lokasi
-                                    </label>
-                                    <input type="text" class="form-control @error('lokasi') is-invalid @enderror" 
-                                           id="lokasi" name="lokasi" 
-                                           placeholder="Misal: Lab TKJ" maxlength="60"
-                                           value="{{ old('lokasi') }}">
-                                    @error('lokasi')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            {{-- Merk / Tipe --}}
+                            <div>
+                                <label for="merk_tipe" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-tag mr-1 text-blue-500"></i> Merk / Tipe
+                                </label>
+                                <input type="text" id="merk_tipe" name="merk_tipe" maxlength="80"
+                                       value="{{ old('merk_tipe') }}" placeholder="Misal: HP P3015"
+                                       class="form-control w-full py-2.5">
+                            </div>
+
+                            {{-- Lokasi --}}
+                            <div>
+                                <label for="lokasi" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-location-dot mr-1 text-rose-500"></i> Lokasi Penempatan
+                                </label>
+                                <input type="text" id="lokasi" name="lokasi" maxlength="60"
+                                       value="{{ old('lokasi') }}" placeholder="Misal: Lab TKJ 1"
+                                       class="form-control w-full py-2.5">
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="spesifikasi" class="form-label">
-                                <i class="fas fa-info-circle"></i> Spesifikasi
-                            </label>
-                            <textarea class="form-control @error('spesifikasi') is-invalid @enderror" 
-                                      id="spesifikasi" name="spesifikasi" rows="3"
-                                      placeholder="Deskripsi detail aset, kondisi, fitur khusus, dll...">{{ old('spesifikasi') }}</textarea>
-                            <small class="form-text text-muted">Detil teknis dan deskripsi aset</small>
-                            @error('spesifikasi')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <hr class="mb-8 border-slate-200 dark:border-slate-800">
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="thn_perolehan" class="form-label">
-                                        <i class="fas fa-calendar"></i> Tahun Perolehan
-                                    </label>
-                                    <input type="number" class="form-control @error('thn_perolehan') is-invalid @enderror" 
-                                           id="thn_perolehan" name="thn_perolehan" 
-                                           placeholder="2024" min="1900" max="2099"
-                                           value="{{ old('thn_perolehan') }}">
-                                    @error('thn_perolehan')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                    {{-- Section 2: Spesifikasi & Detail Pengadaan --}}
+                    <div class="mb-8">
+                        <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            <span class="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-xs text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">2</span>
+                            Spesifikasi & Detail Pengadaan
+                        </h3>
+
+                        <div class="grid gap-5 sm:grid-cols-3">
+                            {{-- Spesifikasi --}}
+                            <div class="sm:col-span-3">
+                                <label for="spesifikasi" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-circle-info mr-1 text-blue-500"></i> Detail Spesifikasi
+                                </label>
+                                <textarea id="spesifikasi" name="spesifikasi" rows="3"
+                                          placeholder="Tuliskan spesifikasi detail RAM, CPU, kapasitas penyimpanan, kelengkapan port dll..."
+                                          class="form-control w-full py-2.5">{{ old('spesifikasi') }}</textarea>
+                            </div>
+
+                            {{-- Tahun Perolehan --}}
+                            <div>
+                                <label for="thn_perolehan" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-regular fa-calendar mr-1 text-blue-500"></i> Tahun Perolehan
+                                </label>
+                                <input type="number" id="thn_perolehan" name="thn_perolehan" min="1900" max="2099"
+                                       value="{{ old('thn_perolehan') }}" placeholder="2024"
+                                       class="form-control w-full py-2.5">
+                            </div>
+
+                            {{-- Harga Perolehan --}}
+                            <div>
+                                <label for="harga_perolehan" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-coins mr-1 text-emerald-500"></i> Harga Perolehan (Rupiah)
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-semibold">Rp</span>
+                                    <input type="number" id="harga_perolehan" name="harga_perolehan" min="0" step="0.01"
+                                           value="{{ old('harga_perolehan') }}" placeholder="0"
+                                           class="form-control w-full py-2.5 pl-9">
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="harga_perolehan" class="form-label">
-                                        <i class="fas fa-money-bill"></i> Harga Perolehan
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="number" class="form-control @error('harga_perolehan') is-invalid @enderror" 
-                                               id="harga_perolehan" name="harga_perolehan" 
-                                               placeholder="0" min="0" step="0.01"
-                                               value="{{ old('harga_perolehan') }}">
-                                    </div>
-                                    @error('harga_perolehan')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="asal_usul" class="form-label">
-                                        <i class="fas fa-arrow-down"></i> Asal Usul <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select @error('asal_usul') is-invalid @enderror" 
-                                            id="asal_usul" name="asal_usul" required>
-                                        <option value="">-- Pilih Asal Usul --</option>
-                                        @foreach($asalUsul as $option)
-                                            <option value="{{ $option }}" @selected(old('asal_usul') === $option)>
-                                                {{ $option }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('asal_usul')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            {{-- Asal Usul --}}
+                            <div>
+                                <label for="asal_usul" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    <i class="fa-solid fa-file-invoice mr-1 text-blue-500"></i> Asal Usul <span class="text-rose-500">*</span>
+                                </label>
+                                <select id="asal_usul" name="asal_usul" required class="form-control w-full py-2.5">
+                                    <option value="">-- Pilih Asal Usul --</option>
+                                    @foreach($asalUsul as $option)
+                                        <option value="{{ $option }}" @selected(old('asal_usul') === $option)>
+                                            {{ $option }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ route('assets.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Kembali
-                            </a>
-                            <button type="reset" class="btn btn-warning">
-                                <i class="fas fa-redo"></i> Reset
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Simpan Aset
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    {{-- Form Actions --}}
+                    <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-6 dark:border-slate-800">
+                        <a href="{{ route('assets.index') }}" class="btn-secondary">
+                            Batal
+                        </a>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Aset
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
