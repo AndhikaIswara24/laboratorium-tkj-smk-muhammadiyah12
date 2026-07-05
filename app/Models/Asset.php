@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model
 {
+    use HasFactory;
+
     protected $table = 't_aset';
     protected $primaryKey = 'id_aset';
     public $timestamps = true;
+    const UPDATED_AT = null; // t_aset hanya punya kolom created_at
+
     
     protected $fillable = [
         'kode_brg',

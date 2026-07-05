@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\phpunit.xml" tests="25" assertions="61" errors="0" failures="0" skipped="0" time="4.114773">
+    <testsuite name="Unit" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.003809">
+      <testsuite name="Tests\Unit\ExampleTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Unit\ExampleTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.003809">
+        <testcase name="test_that_true_is_true" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Unit\ExampleTest.php" line="12" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="1" time="0.003809"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="24" assertions="60" errors="0" failures="0" skipped="0" time="4.110964">
+      <testsuite name="Tests\Feature\Auth\AuthenticationTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\AuthenticationTest.php" tests="4" assertions="8" errors="0" failures="0" skipped="0" time="1.869857">
+        <testcase name="test_login_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\AuthenticationTest.php" line="13" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="1" time="1.349139"/>
+        <testcase name="test_users_can_authenticate_using_the_login_screen" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\AuthenticationTest.php" line="20" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="3" time="0.177368"/>
+        <testcase name="test_users_can_not_authenticate_with_invalid_password" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\AuthenticationTest.php" line="33" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="1" time="0.284815"/>
+        <testcase name="test_users_can_logout" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\AuthenticationTest.php" line="45" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="3" time="0.058535"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\EmailVerificationTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\EmailVerificationTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="0.218280">
+        <testcase name="test_email_verification_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\EmailVerificationTest.php" line="16" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="1" time="0.076101"/>
+        <testcase name="test_email_can_be_verified" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\EmailVerificationTest.php" line="25" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="4" time="0.071527"/>
+        <testcase name="test_email_is_not_verified_with_invalid_hash" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\EmailVerificationTest.php" line="44" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="1" time="0.070652"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordConfirmationTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordConfirmationTest.php" tests="3" assertions="4" errors="0" failures="0" skipped="0" time="0.412145">
+        <testcase name="test_confirm_password_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordConfirmationTest.php" line="13" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="1" time="0.072002"/>
+        <testcase name="test_password_can_be_confirmed" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordConfirmationTest.php" line="22" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="2" time="0.071733"/>
+        <testcase name="test_password_is_not_confirmed_with_invalid_password" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordConfirmationTest.php" line="34" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="1" time="0.268410"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordResetTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordResetTest.php" tests="4" assertions="8" errors="0" failures="0" skipped="0" time="0.954861">
+        <testcase name="test_reset_password_link_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordResetTest.php" line="15" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.073700"/>
+        <testcase name="test_reset_password_link_can_be_requested" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordResetTest.php" line="22" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.290272"/>
+        <testcase name="test_reset_password_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordResetTest.php" line="33" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="2" time="0.298709"/>
+        <testcase name="test_password_can_be_reset_with_valid_token" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordResetTest.php" line="50" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="4" time="0.292180"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordUpdateTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordUpdateTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="0.149164">
+        <testcase name="test_password_can_be_updated" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordUpdateTest.php" line="14" class="Tests\Feature\Auth\PasswordUpdateTest" classname="Tests.Feature.Auth.PasswordUpdateTest" assertions="4" time="0.078898"/>
+        <testcase name="test_correct_password_must_be_provided_to_update_password" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\PasswordUpdateTest.php" line="34" class="Tests\Feature\Auth\PasswordUpdateTest" classname="Tests.Feature.Auth.PasswordUpdateTest" assertions="4" time="0.070266"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\RegistrationTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\RegistrationTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.124834">
+        <testcase name="test_registration_screen_can_be_rendered" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\RegistrationTest.php" line="12" class="Tests\Feature\Auth\RegistrationTest" classname="Tests.Feature.Auth.RegistrationTest" assertions="1" time="0.067210"/>
+        <testcase name="test_new_users_can_register" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\Auth\RegistrationTest.php" line="19" class="Tests\Feature\Auth\RegistrationTest" classname="Tests.Feature.Auth.RegistrationTest" assertions="3" time="0.057625"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ExampleTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ExampleTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.052262">
+        <testcase name="test_the_application_returns_a_successful_response" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ExampleTest.php" line="13" class="Tests\Feature\ExampleTest" classname="Tests.Feature.ExampleTest" assertions="1" time="0.052262"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProfileTest" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" tests="5" assertions="21" errors="0" failures="0" skipped="0" time="0.329561">
+        <testcase name="test_profile_page_is_displayed" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" line="13" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="1" time="0.094231"/>
+        <testcase name="test_profile_information_can_be_updated" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" line="24" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="6" time="0.060315"/>
+        <testcase name="test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" line="46" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="4" time="0.059209"/>
+        <testcase name="test_user_can_delete_their_account" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" line="64" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="5" time="0.058644"/>
+        <testcase name="test_correct_password_must_be_provided_to_delete_account" file="D:\Aplikasi\laboratorium-tkj-smk-muhammadiyah12\tests\Feature\ProfileTest.php" line="82" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="5" time="0.057161"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

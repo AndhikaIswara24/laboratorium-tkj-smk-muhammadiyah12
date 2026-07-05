@@ -151,7 +151,7 @@
                                         default => 'bg-slate-50 text-slate-700'
                                     };
                                 @endphp
-                                <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset {{ $dayClass }}">
+                                <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset {{ $dayaClass }}">
                                     {{ $row->daya_listrik }}
                                 </span>
                             </td>

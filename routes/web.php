@@ -26,8 +26,8 @@ Route::middleware(['auth'])->group(function () {
     // Asset management - teknisi and admin
     Route::post('/assets/import', [AssetController::class, 'import'])->name('assets.import')->middleware('role:admin|teknisi');
     Route::resource('assets', AssetController::class)
-         ->middleware('role:admin|teknisi')
-         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        ->middleware('role:admin|teknisi')
+        ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
     // Kondisi Fisik - teknisi and admin
     Route::middleware('role:admin|teknisi')->group(function () {
@@ -101,4 +101,4 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -30,17 +30,17 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin(): bool
+    public function Admin(): bool
     {
         return $this->role === 'admin';
     }
 
-    public function isTeknisi(): bool
+    public function Teknisi(): bool
     {
         return $this->role === 'teknisi';
     }
 
-    public function isUser(): bool
+    public function User(): bool
     {
         return $this->role === 'user';
     }

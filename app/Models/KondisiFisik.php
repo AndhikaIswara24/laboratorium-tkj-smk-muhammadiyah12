@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KondisiFisik extends Model
 {
+    use HasFactory;
+
     protected $table = 't_kondisi_fisik';
     protected $primaryKey = 'id_kondisi';
     public $timestamps = false;

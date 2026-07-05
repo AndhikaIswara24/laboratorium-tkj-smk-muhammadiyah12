@@ -42,4 +42,34 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Set user role to admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Set user role to teknisi.
+     */
+    public function teknisi(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'teknisi',
+        ]);
+    }
+
+    /**
+     * Set user role to user (default).
+     */
+    public function user(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'user',
+        ]);
+    }
 }

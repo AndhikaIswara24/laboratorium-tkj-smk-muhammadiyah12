@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Pemeliharaan extends Model
 {
+    use HasFactory;
+
     protected $table = 't_pemeliharaan';
     protected $primaryKey = 'id_pm';
     public $timestamps = false;

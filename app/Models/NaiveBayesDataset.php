@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NaiveBayesDataset extends Model
 {
+    use HasFactory;
+
     protected $table = 't_naive_bayes_dataset';
     protected $primaryKey = 'id_dataset';
     public $timestamps = false;

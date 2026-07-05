@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Efisiensi extends Model
 {
+    use HasFactory;
+
     protected $table = 't_efisiensi';
     protected $primaryKey = 'id_efisiensi';
     public $timestamps = false;
