@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Asset management - teknisi and admin
     Route::post('/assets/import', [AssetController::class, 'import'])->name('assets.import')->middleware('role:admin|teknisi');
+    Route::delete('/assets/destroy-all', [AssetController::class, 'destroyAll'])->name('assets.destroyAll')->middleware('role:admin|teknisi');
     Route::resource('assets', AssetController::class)
         ->middleware('role:admin|teknisi')
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
@@ -91,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Laporan - admin only
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index')->middleware('role:admin');
+    Route::get('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate')->middleware('role:admin');
 
     // Admin user management
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {

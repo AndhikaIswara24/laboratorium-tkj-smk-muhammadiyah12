@@ -66,7 +66,7 @@ class VariabelEksternalController extends Controller
      */
     public function create()
     {
-        $assets = Asset::orderBy('nama_brg')->get();
+        $assets = Asset::whereDoesntHave('variabelEksternal')->orderBy('nama_brg')->get();
         return view('variabel-eksternal.create', compact('assets'));
     }
 
@@ -76,13 +76,15 @@ class VariabelEksternalController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_variabel_eksternal,id_aset',
             'tgl_observasi' => 'required|date',
             'lingkungan' => 'required|in:Baik,Cukup,Buruk',
             'daya_listrik' => 'required|in:Stabil,Tidak Stabil,Sering Padam',
             'sparepart' => 'required|in:Tersedia,Terbatas,Tidak Ada',
             'anggaran' => 'required|in:Mendukung,Terbatas,Tidak Ada',
             'ext_effect' => 'required|in:Rendah,Sedang,Tinggi',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data variabel eksternal. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         VariabelEksternal::create($validated);
@@ -109,13 +111,15 @@ class VariabelEksternalController extends Controller
         $variabel = VariabelEksternal::findOrFail($id);
 
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_variabel_eksternal,id_aset,' . $id . ',id_eksternal',
             'tgl_observasi' => 'required|date',
             'lingkungan' => 'required|in:Baik,Cukup,Buruk',
             'daya_listrik' => 'required|in:Stabil,Tidak Stabil,Sering Padam',
             'sparepart' => 'required|in:Tersedia,Terbatas,Tidak Ada',
             'anggaran' => 'required|in:Mendukung,Terbatas,Tidak Ada',
             'ext_effect' => 'required|in:Rendah,Sedang,Tinggi',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data variabel eksternal. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         $variabel->update($validated);

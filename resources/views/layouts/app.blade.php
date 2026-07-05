@@ -25,7 +25,7 @@
             <div class="flex pt-16">
                 @include('partials.sidebar')
 
-                <main id="dashboardMain" class="min-h-[calc(100vh-4rem)] flex-1 transition-all duration-300 lg:pl-72">
+                <main id="dashboardMain" class="min-h-[calc(100vh-4rem)] min-w-0 flex-1 overflow-x-hidden transition-all duration-300 lg:pl-72">
                     <div class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
                         @isset($header)
                             <div class="mb-6">

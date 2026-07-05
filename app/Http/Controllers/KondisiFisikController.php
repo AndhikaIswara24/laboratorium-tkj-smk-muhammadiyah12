@@ -47,7 +47,7 @@ class KondisiFisikController extends Controller
      */
     public function create()
     {
-        $assets = Asset::orderBy('nama_brg')->get();
+        $assets = Asset::whereDoesntHave('kondisiFisik')->orderBy('nama_brg')->get();
         return view('kondisi-fisik.create', compact('assets'));
     }
 
@@ -57,12 +57,14 @@ class KondisiFisikController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_kondisi_fisik,id_aset',
             'tgl_observasi' => 'required|date',
             'kondisi_brg' => 'required|in:B,RR,RB',
             'ket_teknis' => 'required|in:Normal,Lemah,Lambat,Mati Total',
             'frq_kerusakan' => 'required|integer|min:0',
             'kelas_label' => 'required|in:Layak,Perlu Servis,Tidak Layak',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data kondisi fisik. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         // Hitung usia_pakai otomatis dari tahun sekarang - thn_perolehan
@@ -95,12 +97,14 @@ class KondisiFisikController extends Controller
         $kondisi = KondisiFisik::findOrFail($id);
 
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_kondisi_fisik,id_aset,' . $id . ',id_kondisi',
             'tgl_observasi' => 'required|date',
             'kondisi_brg' => 'required|in:B,RR,RB',
             'ket_teknis' => 'required|in:Normal,Lemah,Lambat,Mati Total',
             'frq_kerusakan' => 'required|integer|min:0',
             'kelas_label' => 'required|in:Layak,Perlu Servis,Tidak Layak',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data kondisi fisik. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         // Hitung usia_pakai otomatis

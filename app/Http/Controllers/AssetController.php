@@ -98,6 +98,32 @@ class AssetController extends Controller
     }
 
     /**
+     * Delete all assets from the database.
+     */
+    public function destroyAll()
+    {
+        $count = Asset::count();
+
+        if ($count === 0) {
+            return redirect()->route('assets.index')
+                            ->with('error', 'Tidak ada data aset untuk dihapus.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+            Asset::truncate();
+            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+            return redirect()->route('assets.index')
+                            ->with('error', 'Gagal menghapus data aset: ' . $e->getMessage());
+        }
+
+        return redirect()->route('assets.index')
+                        ->with('success', "Berhasil menghapus seluruh {$count} data aset.");
+    }
+
+    /**
      * Import assets from uploaded CSV file.
      */
     public function import(Request $request)
@@ -111,24 +137,58 @@ class AssetController extends Controller
 
         // Native CSV reading
         if (($handle = fopen($path, 'r')) !== FALSE) {
-            // Read header
-            $header = fgetcsv($handle, 1000, ',');
+            // Remove BOM if present (common in Excel-exported CSV)
+            $bom = fread($handle, 3);
+            if ($bom !== "\xEF\xBB\xBF") {
+                rewind($handle);
+            }
+
+            // Read header (0 = unlimited line length)
+            $header = fgetcsv($handle, 0, ',');
             if (!$header) {
                 return redirect()->route('assets.index')->with('error', 'File CSV kosong.');
             }
 
-            // Normalize header names (lowercase, remove spaces)
+            // Try semicolon delimiter if only 1 column detected
+            if (count($header) <= 1) {
+                rewind($handle);
+                $bom = fread($handle, 3);
+                if ($bom !== "\xEF\xBB\xBF") {
+                    rewind($handle);
+                }
+                $header = fgetcsv($handle, 0, ';');
+            }
+
+            // Determine delimiter
+            $delimiter = count($header) > 1 ? ',' : ';';
+            if (str_contains(implode('', $header), ';')) {
+                $delimiter = ';';
+                rewind($handle);
+                $bom = fread($handle, 3);
+                if ($bom !== "\xEF\xBB\xBF") {
+                    rewind($handle);
+                }
+                $header = fgetcsv($handle, 0, ';');
+            }
+
+            // Normalize header names (lowercase, remove spaces, underscores, BOM chars)
             $header = array_map(function($h) {
+                $h = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $h); // Remove non-printable chars
                 return strtolower(trim(str_replace([' ', '_'], '', $h)));
             }, $header);
 
             $successCount = 0;
             $errorCount = 0;
+            $skippedEmpty = 0;
             $errors = [];
 
-            while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-                // Skip empty rows
-                if (empty($data) || count($data) < 2) continue;
+            while (($data = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
+                // Skip truly empty rows (all cells empty or row has < 2 cells)
+                $nonEmpty = array_filter($data, function($v) { return trim($v) !== ''; });
+                if (empty($nonEmpty) || count($data) < 2) {
+                    $skippedEmpty++;
+                    continue;
+                }
 
                 // Map header to values
                 $row = array_combine(array_intersect_key($header, $data), array_intersect_key($data, $header));
@@ -143,17 +203,21 @@ class AssetController extends Controller
                 $harga_perolehan = $row['hargaperolehan'] ?? $data[6] ?? null;
                 $asal_usul = $row['asalusul'] ?? $data[7] ?? 'Pembelian';
 
-                if (!$kode_brg || !$nama_brg) {
+                if (!trim($kode_brg) || !trim($nama_brg)) {
                     $errorCount++;
-                    $errors[] = "Baris dengan data kosong dilewati.";
+                    $errors[] = "Baris dengan kode/nama barang kosong dilewati.";
                     continue;
                 }
 
                 // Clean and normalize input
                 $asal_usul = trim($asal_usul);
                 $asal_usul = in_array($asal_usul, ['Pembelian', 'Hibah', 'Dropping Dinas', 'Dana BOS']) ? $asal_usul : 'Pembelian';
-                $harga_perolehan = is_numeric($harga_perolehan) ? $harga_perolehan : null;
-                $thn_perolehan = is_numeric($thn_perolehan) && strlen($thn_perolehan) == 4 ? $thn_perolehan : null;
+
+                // Parse harga_perolehan: handle Indonesian format (dots as thousands separator)
+                // e.g., "90.000" → 90000, "1.500.000" → 1500000, "Rp 90.000" → 90000
+                $harga_perolehan = $this->cleanNumericValue($harga_perolehan);
+
+                $thn_perolehan = is_numeric(trim($thn_perolehan)) && strlen(trim($thn_perolehan)) == 4 ? trim($thn_perolehan) : null;
 
                 try {
                     Asset::updateOrCreate(
@@ -177,6 +241,9 @@ class AssetController extends Controller
             fclose($handle);
 
             $msg = "Berhasil mengimpor {$successCount} aset.";
+            if ($skippedEmpty > 0) {
+                $msg .= " {$skippedEmpty} baris kosong dilewati.";
+            }
             if ($errorCount > 0) {
                 $msg .= " Gagal {$errorCount} baris. Detail: " . implode(', ', array_slice($errors, 0, 3));
             }
@@ -185,6 +252,43 @@ class AssetController extends Controller
         }
 
         return redirect()->route('assets.index')->with('error', 'Gagal membaca file CSV.');
+    }
+
+    /**
+     * Clean and parse a numeric value from CSV, handling Indonesian format.
+     * Converts "90.000" → 90000, "1.500.000" → 1500000, "Rp 90.000" → 90000
+     */
+    private function cleanNumericValue($value)
+    {
+        if ($value === null || trim($value) === '' || trim($value) === '-') {
+            return null;
+        }
+
+        $value = trim($value);
+
+        // Remove currency prefix like "Rp", "Rp.", "IDR"
+        $value = preg_replace('/^(Rp\.?\s*|IDR\s*)/i', '', $value);
+        $value = trim($value);
+
+        // Detect Indonesian format: dots as thousands separators
+        // Pattern: digits separated by dots in groups of 3 (e.g., "1.500.000", "90.000")
+        // But NOT a single decimal like "90.50"
+        if (preg_match('/^\d{1,3}(\.\d{3})+$/', $value)) {
+            // Indonesian format: remove dots (thousands separators)
+            $value = str_replace('.', '', $value);
+        } elseif (preg_match('/^\d{1,3}(\.\d{3})+(,\d+)?$/', $value)) {
+            // Indonesian format with decimal comma: "1.500.000,50"
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        } elseif (preg_match('/^\d{1,3}(,\d{3})+(\.\d+)?$/', $value)) {
+            // English format with commas: "1,500,000.50"
+            $value = str_replace(',', '', $value);
+        }
+
+        // Remove any remaining non-numeric chars except dot and minus
+        $value = preg_replace('/[^0-9.\-]/', '', $value);
+
+        return is_numeric($value) ? (float) $value : null;
     }
 }
 

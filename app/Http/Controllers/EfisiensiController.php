@@ -52,7 +52,7 @@ class EfisiensiController extends Controller
      */
     public function create()
     {
-        $assets = Asset::orderBy('nama_brg')->get();
+        $assets = Asset::whereDoesntHave('efisiensi')->orderBy('nama_brg')->get();
         return view('efisiensi.create', compact('assets'));
     }
 
@@ -62,7 +62,7 @@ class EfisiensiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_efisiensi,id_aset',
             'tgl_observasi' => 'required|date',
             'jam_ops' => 'required|numeric|min:0',
             'penggunaan' => 'required|in:Tinggi,Sedang,Tidak Pakai',
@@ -71,6 +71,8 @@ class EfisiensiController extends Controller
             'perform' => 'required|in:Normal,Lambat,Mati',
             'umur_ekonomis' => 'required|integer|min:0',
             'efi_out' => 'required|in:Tinggi,Sedang,Rendah',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data efisiensi. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         Efisiensi::create($validated);
@@ -97,7 +99,7 @@ class EfisiensiController extends Controller
         $efisiensi = Efisiensi::findOrFail($id);
 
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_efisiensi,id_aset,' . $id . ',id_efisiensi',
             'tgl_observasi' => 'required|date',
             'jam_ops' => 'required|numeric|min:0',
             'penggunaan' => 'required|in:Tinggi,Sedang,Tidak Pakai',
@@ -106,6 +108,8 @@ class EfisiensiController extends Controller
             'perform' => 'required|in:Normal,Lambat,Mati',
             'umur_ekonomis' => 'required|integer|min:0',
             'efi_out' => 'required|in:Tinggi,Sedang,Rendah',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data efisiensi. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         $efisiensi->update($validated);

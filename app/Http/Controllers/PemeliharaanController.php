@@ -47,7 +47,7 @@ class PemeliharaanController extends Controller
      */
     public function create()
     {
-        $assets = Asset::orderBy('nama_brg')->get();
+        $assets = Asset::whereDoesntHave('pemeliharaan')->orderBy('nama_brg')->get();
         return view('pemeliharaan.create', compact('assets'));
     }
 
@@ -57,7 +57,7 @@ class PemeliharaanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_pemeliharaan,id_aset',
             'tgl_pm' => 'required|date',
             'jenis_pm' => 'required|in:Preventif,Korektif,Tidak Ada',
             'interval_bulan' => 'required|integer|min:0',
@@ -65,6 +65,8 @@ class PemeliharaanController extends Controller
             'biaya_servis' => 'required|numeric|min:0',
             'kon_after' => 'required|in:B,RR,RB',
             'ket_pm' => 'nullable|string',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data pemeliharaan. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         Pemeliharaan::create($validated);
@@ -91,7 +93,7 @@ class PemeliharaanController extends Controller
         $pemeliharaan = Pemeliharaan::findOrFail($id);
 
         $validated = $request->validate([
-            'id_aset' => 'required|exists:t_aset,id_aset',
+            'id_aset' => 'required|exists:t_aset,id_aset|unique:t_pemeliharaan,id_aset,' . $id . ',id_pm',
             'tgl_pm' => 'required|date',
             'jenis_pm' => 'required|in:Preventif,Korektif,Tidak Ada',
             'interval_bulan' => 'required|integer|min:0',
@@ -99,6 +101,8 @@ class PemeliharaanController extends Controller
             'biaya_servis' => 'required|numeric|min:0',
             'kon_after' => 'required|in:B,RR,RB',
             'ket_pm' => 'nullable|string',
+        ], [
+            'id_aset.unique' => 'Aset ini sudah memiliki data pemeliharaan. Setiap aset hanya boleh diobservasi sekali.',
         ]);
 
         $pemeliharaan->update($validated);

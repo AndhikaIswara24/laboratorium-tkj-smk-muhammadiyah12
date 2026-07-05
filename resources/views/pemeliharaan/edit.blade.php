@@ -61,8 +61,8 @@
                                 <label for="id_aset" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                                     <i class="fa-solid fa-cube mr-1 text-amber-500"></i> Pilih Aset <span class="text-rose-500">*</span>
                                 </label>
-                                <select id="id_aset" name="id_aset" required
-                                        class="form-control w-full py-2.5 @error('id_aset') !border-rose-400 !ring-rose-400 @enderror"
+                                <select id="id_aset_select" name="id_aset_select" required disabled
+                                        class="form-control w-full py-2.5 bg-slate-100 text-slate-500 cursor-not-allowed dark:bg-slate-850 dark:text-slate-400 @error('id_aset') !border-rose-400 !ring-rose-400 @enderror"
                                         onchange="fetchAssetData(this.value)">
                                     <option value="">-- Pilih Aset --</option>
                                     @foreach($assets as $aset)
@@ -71,7 +71,10 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <p class="mt-1 text-xs text-slate-400">Pilih aset yang dilakukan tindakan pemeliharaan.</p>
+                                <input type="hidden" name="id_aset" value="{{ $pemeliharaan->id_aset }}">
+                                <p class="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
+                                    <i class="fa-solid fa-circle-info mr-1"></i> Aset yang diobservasi tidak dapat diubah setelah dibuat demi menjaga integritas data riwayat.
+                                </p>
                                 @error('id_aset')
                                     <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
                                 @enderror

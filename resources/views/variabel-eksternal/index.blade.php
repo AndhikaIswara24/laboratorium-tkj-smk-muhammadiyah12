@@ -14,12 +14,6 @@
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('variabel.export.csv') }}" class="btn-secondary">
-                <i class="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Export CSV
-            </a>
-            <a href="{{ route('variabel.export.excel') }}" class="btn-secondary">
-                <i class="fa-regular fa-file-excel text-green-600 dark:text-green-400"></i> Export Excel
-            </a>
             <a href="{{ route('variabel.create') }}" class="btn-primary">
                 <i class="fa-solid fa-plus"></i> Tambah Observasi Variabel
             </a>

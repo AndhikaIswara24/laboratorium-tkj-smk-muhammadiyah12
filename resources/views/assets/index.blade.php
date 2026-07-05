@@ -2,7 +2,7 @@
 @section('title', 'Data Aset')
 @section('content')
 
-<div class="space-y-6" x-data="{ showImport: false }">
+<div class="space-y-6" x-data="{ showImport: false, showDeleteAll: false }">
     {{-- Page Header --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -14,12 +14,47 @@
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
+            @if($items->total() > 0)
+                <button @click="showDeleteAll = true" class="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-900 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-rose-500/10">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Semua Data
+                </button>
+            @endif
             <button @click="showImport = !showImport" class="btn-secondary">
                 <i class="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i> Import Aset (CSV)
             </button>
             <a href="{{ route('assets.create') }}" class="btn-primary">
                 <i class="fa-solid fa-plus"></i> Tambah Aset
             </a>
+        </div>
+    </div>
+
+    {{-- Delete All Confirmation Modal --}}
+    <div x-cloak x-show="showDeleteAll" class="fixed inset-0 z-[60] flex items-center justify-center p-4" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="showDeleteAll = false"></div>
+        {{-- Modal Content --}}
+        <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" @click.outside="showDeleteAll = false">
+            <div class="flex flex-col items-center text-center">
+                <div class="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/10">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl text-rose-600 dark:text-rose-400"></i>
+                </div>
+                <h3 class="mt-4 text-lg font-bold text-slate-900 dark:text-white">Hapus Semua Data Aset?</h3>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    Tindakan ini akan menghapus <span class="font-bold text-rose-600 dark:text-rose-400">{{ $items->total() }} data aset</span> secara permanen dan tidak dapat dikembalikan. Pastikan Anda sudah yakin sebelum melanjutkan.
+                </p>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <button @click="showDeleteAll = false" class="btn-secondary flex-1">
+                    <i class="fa-solid fa-xmark"></i> Batal
+                </button>
+                <form action="{{ route('assets.destroyAll') }}" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950">
+                        <i class="fa-solid fa-trash-can"></i> Ya, Hapus Semua
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -45,27 +80,27 @@
 
     {{-- CSV Import Dropzone Form --}}
     <div x-cloak x-show="showImport" x-transition class="rounded-xl border border-blue-200 bg-blue-50/55 p-6 dark:border-blue-500/20 dark:bg-blue-500/5">
-        <div class="flex flex-col md:flex-row gap-6 justify-between">
+        <div class="space-y-4">
             <div class="space-y-2">
                 <h3 class="text-base font-bold text-blue-900 dark:text-blue-200">
                     <i class="fa-solid fa-file-excel mr-1"></i> Petunjuk Import Data Aset (CSV)
                 </h3>
-                <p class="text-sm text-blue-800 dark:text-blue-300 max-w-xl leading-relaxed">
+                <p class="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
                     Unggah file CSV dengan header kolom berikut: 
-                    <code class="block mt-2 p-2 bg-white dark:bg-slate-900 rounded font-mono text-xs select-all border border-blue-100 dark:border-slate-800">
+                    <code class="block mt-2 p-2 bg-white dark:bg-slate-900 rounded font-mono text-xs select-all border border-blue-100 dark:border-slate-800 break-all">
                         kode_brg, nama_brg, merk_tipe, spesifikasi, lokasi, thn_perolehan, harga_perolehan, asal_usul
                     </code>
                     * Kolom <span class="font-bold">kode_brg</span> (harus unik) & <span class="font-bold">nama_brg</span> wajib diisi. Kolom <span class="font-bold">asal_usul</span> diisi salah satu dari: <span class="font-semibold">Pembelian, Hibah, Dropping Dinas, Dana BOS</span>.
                 </p>
             </div>
-            <form action="{{ route('assets.import') }}" method="POST" enctype="multipart/form-data" class="flex items-end gap-3 self-center md:self-end">
+            <form action="{{ route('assets.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 @csrf
-                <div class="space-y-1">
+                <div class="flex-1 space-y-1">
                     <label for="csv_file" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pilih File CSV</label>
                     <input type="file" id="csv_file" name="file" accept=".csv,.txt" required
                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-800 dark:file:text-slate-300">
                 </div>
-                <button type="submit" class="btn-primary py-2.5">
+                <button type="submit" class="btn-primary py-2.5 shrink-0">
                     <i class="fa-solid fa-upload"></i> Unggah
                 </button>
             </form>
@@ -158,25 +193,25 @@
     {{-- Data Table --}}
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="w-full text-left text-sm" style="min-width: 900px;">
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">#</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Kode Barang</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Nama Barang</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Merk/Tipe</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Lokasi / Lab</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Tahun Perolehan</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Harga Perolehan</th>
-                        <th class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Asal Usul</th>
-                        <th class="px-4 py-3.5 text-center font-semibold text-slate-600 dark:text-slate-300">Aksi</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">#</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Kode Barang</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Nama Barang</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Merk/Tipe</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Lokasi / Lab</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Tahun</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Harga Perolehan</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">Asal Usul</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-center font-semibold text-slate-600 dark:text-slate-300">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     @forelse($items as $item)
                         <tr class="transition hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="px-4 py-4 text-slate-500">{{ ($items->currentPage()-1) * $items->perPage() + $loop->iteration }}</td>
-                            <td class="px-4 py-4 font-semibold text-blue-600 dark:text-blue-300">{{ $item->kode_brg }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-slate-500">{{ ($items->currentPage()-1) * $items->perPage() + $loop->iteration }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 font-semibold text-blue-600 dark:text-blue-300">{{ $item->kode_brg }}</td>
                             <td class="px-4 py-4">
                                 <div class="font-bold text-slate-800 dark:text-slate-200">{{ $item->nama_brg }}</div>
                                 @if($item->spesifikasi)
@@ -185,15 +220,15 @@
                                     </p>
                                 @endif
                             </td>
-                            <td class="px-4 py-4 text-slate-700 dark:text-slate-300">{{ $item->merk_tipe ?? '—' }}</td>
-                            <td class="px-4 py-4">
+                            <td class="whitespace-nowrap px-4 py-4 text-slate-700 dark:text-slate-300">{{ $item->merk_tipe ?? '—' }}</td>
+                            <td class="whitespace-nowrap px-4 py-4">
                                 <span class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
                                     <i class="fa-solid fa-location-dot text-rose-500"></i>
                                     {{ $item->lokasi ?? '—' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-4 text-slate-700 dark:text-slate-300 font-medium">{{ $item->thn_perolehan ?? '—' }}</td>
-                            <td class="px-4 py-4">
+                            <td class="whitespace-nowrap px-4 py-4 text-slate-700 dark:text-slate-300 font-medium">{{ $item->thn_perolehan ?? '—' }}</td>
+                            <td class="whitespace-nowrap px-4 py-4">
                                 @if($item->harga_perolehan)
                                     <span class="font-bold text-emerald-600 dark:text-emerald-400">
                                         Rp {{ number_format($item->harga_perolehan, 0, ',', '.') }}
@@ -202,7 +237,7 @@
                                     <span class="text-slate-400">—</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-4">
+                            <td class="whitespace-nowrap px-4 py-4">
                                 @php
                                     $asalClass = match($item->asal_usul) {
                                         'Pembelian' => 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-300',
@@ -216,7 +251,7 @@
                                     {{ $item->asal_usul }}
                                 </span>
                             </td>
-                            <td class="px-4 py-4 text-center">
+                            <td class="whitespace-nowrap px-4 py-4 text-center">
                                 <div class="flex justify-center gap-2">
                                     <a href="{{ route('assets.edit', $item->id_aset) }}" class="btn-secondary px-2.5 py-1.5 text-xs" title="Edit Aset">
                                         <i class="fa-solid fa-pen-to-square"></i>
