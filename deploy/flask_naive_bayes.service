@@ -1,0 +1,17 @@
+[Unit]
+Description=Flask Naive Bayes API
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/your-app/flask_api
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile=/var/www/your-app/.env.production
+# ExecStart uses gunicorn inside the python virtual environment (.venv)
+ExecStart=/var/www/your-app/flask_api/.venv/bin/gunicorn -b 127.0.0.1:5000 "app:app" --workers 3
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

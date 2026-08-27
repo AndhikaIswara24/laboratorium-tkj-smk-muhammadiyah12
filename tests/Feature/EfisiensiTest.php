@@ -156,13 +156,45 @@ class EfisiensiTest extends TestCase
 
     public function test_bisa_melihat_history_efisiensi_per_aset(): void
     {
-        Efisiensi::factory()->count(5)->create(['id_aset' => $this->asset->id_aset]);
+        // Recent records (within 24h) should be visible
+        Efisiensi::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
 
         $response = $this->actingAs($this->admin)->get("/efisiensi/history/{$this->asset->id_aset}");
 
         $response->assertStatus(200);
         $response->assertViewIs('efisiensi.history');
         $response->assertViewHas('asset');
-        $response->assertViewHas('rows');
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 3;
+        });
+    }
+
+    public function test_history_efisiensi_hides_expired_records(): void
+    {
+        // Create 2 recent records (within 24h)
+        Efisiensi::factory()->count(2)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
+
+        // Create 3 expired records (older than 24h)
+        Efisiensi::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now()->subHours(25),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/efisiensi/history/{$this->asset->id_aset}");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 2;
+        });
+
+        // Verify expired records still exist in the database (not deleted)
+        $this->assertDatabaseCount('t_efisiensi', 5);
     }
 }
+

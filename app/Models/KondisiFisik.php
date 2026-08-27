@@ -11,7 +11,8 @@ class KondisiFisik extends Model
 
     protected $table = 't_kondisi_fisik';
     protected $primaryKey = 'id_kondisi';
-    public $timestamps = false;
+    public $timestamps = true;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'id_aset',
@@ -27,7 +28,16 @@ class KondisiFisik extends Model
         'tgl_observasi' => 'date',
         'usia_pakai' => 'integer',
         'frq_kerusakan' => 'integer',
+        'created_at' => 'datetime',
     ];
+
+    /**
+     * Scope: only records created within the last 24 hours.
+     */
+    public function scopeRecent($query)
+    {
+        return $query->where('created_at', '>=', now()->subHours(24));
+    }
 
     /**
      * Relasi ke tabel t_aset

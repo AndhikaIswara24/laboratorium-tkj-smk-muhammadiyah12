@@ -18,23 +18,29 @@
         /* Kop Surat */
         .kop-surat {
             border-bottom: 3px double #000;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 20px;
             text-align: center;
         }
+        .kop-logo {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+        }
         .kop-text h2 {
-            font-size: 14pt;
+            font-size: 13pt;
             font-weight: bold;
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             text-transform: uppercase;
         }
         .kop-text h1 {
             font-size: 16pt;
             font-weight: bold;
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             text-transform: uppercase;
         }
         .kop-text p {
@@ -159,6 +165,7 @@
 
     {{-- Kop Surat Sekolah --}}
     <div class="kop-surat">
+        <img src="{{ asset('img/logo-smk.svg') }}" alt="Logo SMK Muhammadiyah 12" class="kop-logo">
         <div class="kop-text">
             <h1>SMK Muhammadiyah 12 Jakarta</h1>
             <h2>Program Keahlian: Teknik Komputer dan Jaringan (TKJ)</h2>
@@ -214,6 +221,7 @@
                     <th style="width: 15%">Pelaksana</th>
                     <th style="width: 12%">Biaya Servis</th>
                     <th style="width: 10%">Kondisi Akhir</th>
+                    <th style="width: 15%">Keterangan</th>
                 </tr>
             @elseif($tipe === 'efisiensi')
                 <tr>
@@ -268,6 +276,7 @@
                         <td>{{ $row->pelaksana }}</td>
                         <td>Rp {{ number_format($row->biaya_servis, 0, ',', '.') }}</td>
                         <td class="text-center">{{ $row->kon_after }}</td>
+                        <td>{{ $row->ket_pm ?? '-' }}</td>
                     </tr>
                 @elseif($tipe === 'efisiensi')
                     <tr>
@@ -313,8 +322,8 @@
             <p>Mengetahui,</p>
             <p style="margin-top: -10px;">Kepala Laboratorium TKJ</p>
             <div class="signature-space"></div>
-            <p class="signature-name">Alvian Fiqra Ramadhan S.Kom.</p>
-            <p style="margin-top: -10px; font-size: 10pt; color: #444;">NIP. </p>
+            <p class="signature-name">Alvian Fiqra Ramadhan, S.Kom.</p>
+            <p style="margin-top: -10px; font-size: 10pt; color: #444;">NIP. 19880512 201503 1 002</p>
         </div>
     </div>
 

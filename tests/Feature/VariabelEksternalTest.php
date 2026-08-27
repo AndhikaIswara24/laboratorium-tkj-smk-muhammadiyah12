@@ -145,13 +145,45 @@ class VariabelEksternalTest extends TestCase
 
     public function test_bisa_melihat_history_variabel_eksternal_per_aset(): void
     {
-        VariabelEksternal::factory()->count(3)->create(['id_aset' => $this->asset->id_aset]);
+        // Recent records (within 24h) should be visible
+        VariabelEksternal::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
 
         $response = $this->actingAs($this->admin)->get("/variabel-eksternal/history/{$this->asset->id_aset}");
 
         $response->assertStatus(200);
         $response->assertViewIs('variabel-eksternal.history');
         $response->assertViewHas('asset');
-        $response->assertViewHas('rows');
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 3;
+        });
+    }
+
+    public function test_history_variabel_eksternal_hides_expired_records(): void
+    {
+        // Create 2 recent records (within 24h)
+        VariabelEksternal::factory()->count(2)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
+
+        // Create 3 expired records (older than 24h)
+        VariabelEksternal::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now()->subHours(25),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/variabel-eksternal/history/{$this->asset->id_aset}");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 2;
+        });
+
+        // Verify expired records still exist in the database (not deleted)
+        $this->assertDatabaseCount('t_variabel_eksternal', 5);
     }
 }
+

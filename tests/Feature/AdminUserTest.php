@@ -70,6 +70,26 @@ class AdminUserTest extends TestCase
         ]);
     }
 
+    public function test_admin_bisa_mengubah_nama_dan_email_user(): void
+    {
+        $targetUser = User::factory()->user()->create();
+
+        $response = $this->actingAs($this->admin)->patch("/admin/users/{$targetUser->id}", [
+            'name' => 'Nama Baru User',
+            'email' => 'namabaru@example.com',
+            'role' => 'teknisi',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'name' => 'Nama Baru User',
+            'email' => 'namabaru@example.com',
+            'role' => 'teknisi',
+        ]);
+    }
+
+
     public function test_validasi_role_harus_valid(): void
     {
         $targetUser = User::factory()->user()->create();

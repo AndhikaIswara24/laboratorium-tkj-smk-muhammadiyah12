@@ -36,7 +36,7 @@ class KondisiFisikController extends Controller
             $query->where('kelas_label', $filterLabel);
         }
 
-        $rows = $query->latest('tgl_observasi')->paginate(15);
+        $rows = $query->latest('tgl_observasi')->paginate(15)->withQueryString();
         $assets = Asset::orderBy('nama_brg')->get();
 
         return view('kondisi-fisik.index', compact('rows', 'assets', 'search', 'filterKondisi', 'filterLabel'));
@@ -138,6 +138,7 @@ class KondisiFisikController extends Controller
     {
         $asset = Asset::findOrFail($idAset);
         $rows = KondisiFisik::where('id_aset', $idAset)
+                    ->recent()
                     ->latest('tgl_observasi')
                     ->paginate(20);
 

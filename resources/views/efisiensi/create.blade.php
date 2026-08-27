@@ -122,12 +122,12 @@
                             {{-- Jam Ops (Desimal) --}}
                             <div>
                                 <label for="jam_ops" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
-                                    <i class="fa-solid fa-clock mr-1 text-blue-500"></i> Jam Ops / Bulan <span class="text-rose-500">*</span>
+                                    <i class="fa-solid fa-clock mr-1 text-blue-500"></i> Jam Ops / Hari <span class="text-rose-500">*</span>
                                 </label>
                                 <input type="number" step="0.1" id="jam_ops" name="jam_ops"
                                        value="{{ old('jam_ops', 0) }}" min="0" required
                                        class="form-control w-full py-2.5 @error('jam_ops') !border-rose-400 !ring-rose-400 @enderror">
-                                <p class="mt-1 text-[10px] text-slate-400">Jam operasional aktif per bulan (Desimal)</p>
+                                <p class="mt-1 text-[10px] text-slate-400">Jam operasional aktif per hari (Desimal)</p>
                                 @error('jam_ops')
                                     <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
                                 @enderror

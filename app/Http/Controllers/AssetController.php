@@ -17,16 +17,18 @@ class AssetController extends Controller
         $query = Asset::query();
 
         if ($search) {
-            $query->where('kode_brg', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_brg', 'like', "%{$search}%")
                   ->orWhere('nama_brg', 'like', "%{$search}%")
                   ->orWhere('merk_tipe', 'like', "%{$search}%");
+            });
         }
 
         if ($filter_asal) {
             $query->where('asal_usul', $filter_asal);
         }
 
-        $items = $query->latest('created_at')->paginate(15);
+        $items = $query->latest('created_at')->paginate(15)->withQueryString();
 
         // Fetch distribution of Asal Usul for Chart.js
         $distribAsal = [
@@ -129,7 +131,8 @@ class AssetController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
+            // limit uploads to 10MB and only csv/txt mime types
+            'file' => 'required|file|mimes:csv,txt|max:10240',
         ]);
 
         $file = $request->file('file');

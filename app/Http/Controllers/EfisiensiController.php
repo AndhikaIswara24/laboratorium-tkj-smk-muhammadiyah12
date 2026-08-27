@@ -41,7 +41,7 @@ class EfisiensiController extends Controller
             $query->where('efi_out', $filterEfiOut);
         }
 
-        $rows = $query->orderBy('tgl_observasi', 'desc')->paginate(15);
+        $rows = $query->orderBy('tgl_observasi', 'desc')->paginate(15)->withQueryString();
         $assets = Asset::orderBy('nama_brg')->get();
 
         return view('efisiensi.index', compact('rows', 'assets', 'search', 'filterPenggunaan', 'filterPerform', 'filterEfiOut'));
@@ -137,6 +137,7 @@ class EfisiensiController extends Controller
     {
         $asset = Asset::findOrFail($idAset);
         $rows = Efisiensi::where('id_aset', $idAset)
+                    ->recent()
                     ->orderBy('tgl_observasi', 'desc')
                     ->paginate(20);
 

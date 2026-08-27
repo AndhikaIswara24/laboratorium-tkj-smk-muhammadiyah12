@@ -25,3 +25,8 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Flask API - trained model artifacts & Python cache
+/flask_api/model/
+/flask_api/__pycache__/
+*.pkl

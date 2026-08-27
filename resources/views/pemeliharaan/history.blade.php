@@ -32,6 +32,12 @@
         </div>
     </div>
 
+    {{-- 24-Hour Visibility Notice --}}
+    <div class="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-blue-800 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-200">
+        <i class="fa-solid fa-clock text-lg"></i>
+        <span class="flex-1 text-sm font-medium">Halaman ini hanya menampilkan riwayat pemeliharaan yang dicatat dalam <strong>24 jam terakhir</strong>. Data yang lebih lama tetap tersimpan di database dan dapat diakses melalui halaman daftar utama atau ekspor laporan.</span>
+    </div>
+
     {{-- Success Alert --}}
     @if ($message = Session::get('success'))
         <div class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200" x-data="{ show: true }" x-show="show" x-transition>

@@ -60,7 +60,7 @@ class LaporanController extends Controller
             $query->where($dateColumn, '<=', $endDate);
         }
 
-        $data = $query->orderBy($dateColumn, 'desc')->get();
+        $data = $query->orderBy($dateColumn, 'asc')->get();
 
         if ($action === 'print') {
             return view('laporan.print', compact('data', 'tipe', 'startDate', 'endDate'));

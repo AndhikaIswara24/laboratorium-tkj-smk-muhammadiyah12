@@ -36,7 +36,7 @@ class PemeliharaanController extends Controller
             $query->where('kon_after', $filterKondisi);
         }
 
-        $rows = $query->orderBy('tgl_pm', 'desc')->paginate(15);
+        $rows = $query->orderBy('tgl_pm', 'desc')->paginate(15)->withQueryString();
         $assets = Asset::orderBy('nama_brg')->get();
 
         return view('pemeliharaan.index', compact('rows', 'assets', 'search', 'filterJenis', 'filterKondisi'));
@@ -130,6 +130,7 @@ class PemeliharaanController extends Controller
     {
         $asset = Asset::findOrFail($idAset);
         $rows = Pemeliharaan::where('id_aset', $idAset)
+                    ->recent()
                     ->orderBy('tgl_pm', 'desc')
                     ->paginate(20);
 

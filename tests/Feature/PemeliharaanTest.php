@@ -148,13 +148,66 @@ class PemeliharaanTest extends TestCase
 
     public function test_bisa_melihat_history_pemeliharaan_per_aset(): void
     {
-        Pemeliharaan::factory()->count(5)->create(['id_aset' => $this->asset->id_aset]);
+        // Recent records (within 24h) should be visible
+        Pemeliharaan::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
 
         $response = $this->actingAs($this->admin)->get("/pemeliharaan/history/{$this->asset->id_aset}");
 
         $response->assertStatus(200);
         $response->assertViewIs('pemeliharaan.history');
         $response->assertViewHas('asset');
-        $response->assertViewHas('rows');
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 3;
+        });
+    }
+
+    public function test_history_pemeliharaan_hides_expired_records(): void
+    {
+        // Create 2 recent records (within 24h)
+        Pemeliharaan::factory()->count(2)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
+
+        // Create 3 expired records (older than 24h)
+        Pemeliharaan::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now()->subHours(25),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/pemeliharaan/history/{$this->asset->id_aset}");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 2;
+        });
+
+        // Verify expired records still exist in the database (not deleted)
+        $this->assertDatabaseCount('t_pemeliharaan', 5);
+    }
+
+    public function test_laporan_pemeliharaan_menampilkan_keterangan_dan_urutan_awal_ke_terbaru(): void
+    {
+        Pemeliharaan::factory()->create([
+            'id_aset' => $this->asset->id_aset,
+            'tgl_pm' => '2026-07-10',
+            'ket_pm' => 'Pengecekan akhir tahunan.',
+        ]);
+
+        Pemeliharaan::factory()->create([
+            'id_aset' => $this->asset->id_aset,
+            'tgl_pm' => '2026-04-05',
+            'ket_pm' => 'Perbaikan awal bulan april.',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/laporan/generate?tipe=pemeliharaan&action=print');
+
+        $response->assertStatus(200);
+        $response->assertSee('Keterangan');
+        $response->assertSeeInOrder(['05-04-2026', '10-07-2026']);
     }
 }
+

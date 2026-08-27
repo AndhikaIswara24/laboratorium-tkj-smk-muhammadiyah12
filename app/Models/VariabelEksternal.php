@@ -11,7 +11,8 @@ class VariabelEksternal extends Model
 
     protected $table = 't_variabel_eksternal';
     protected $primaryKey = 'id_eksternal';
-    public $timestamps = false;
+    public $timestamps = true;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'id_aset',
@@ -25,7 +26,16 @@ class VariabelEksternal extends Model
 
     protected $casts = [
         'tgl_observasi' => 'date',
+        'created_at' => 'datetime',
     ];
+
+    /**
+     * Scope: only records created within the last 24 hours.
+     */
+    public function scopeRecent($query)
+    {
+        return $query->where('created_at', '>=', now()->subHours(24));
+    }
 
     public function asset()
     {

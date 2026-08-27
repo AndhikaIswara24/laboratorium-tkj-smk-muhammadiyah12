@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -24,13 +26,27 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'role' => ['required','in:admin,teknisi,user'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => ['required', 'in:admin,teknisi,user'],
+            'password' => ['nullable', 'string', 'min:8'],
         ]);
 
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
         $user->role = $data['role'];
+
+        if (!empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
+        }
+
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('status', 'Role updated.');
+        return redirect()->route('admin.users.index')->with('status', 'User updated successfully.');
     }
 
     public function destroy(User $user)
@@ -42,3 +58,4 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('status', 'User deleted.');
     }
 }
+

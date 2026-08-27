@@ -1,0 +1,17 @@
+[Unit]
+Description=Laravel Queue Worker
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/your-app
+EnvironmentFile=/var/www/your-app/.env.production
+ExecStart=/usr/bin/php /var/www/your-app/artisan queue:work --sleep=3 --tries=3 --timeout=120
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=laravel-queue-worker
+
+[Install]
+WantedBy=multi-user.target

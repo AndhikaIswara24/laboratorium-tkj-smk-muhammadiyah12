@@ -51,7 +51,7 @@ class VariabelEksternalController extends Controller
             $query->where('ext_effect', $filterExtEffect);
         }
 
-        $rows = $query->orderBy('tgl_observasi', 'desc')->paginate(15);
+        $rows = $query->orderBy('tgl_observasi', 'desc')->paginate(15)->withQueryString();
         $assets = Asset::orderBy('nama_brg')->get();
 
         return view('variabel-eksternal.index', compact(
@@ -147,6 +147,7 @@ class VariabelEksternalController extends Controller
     {
         $asset = Asset::findOrFail($idAset);
         $rows = VariabelEksternal::where('id_aset', $idAset)
+                    ->recent()
                     ->orderBy('tgl_observasi', 'desc')
                     ->paginate(20);
 

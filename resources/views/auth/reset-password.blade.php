@@ -1,4 +1,13 @@
 <x-guest-layout>
+    <div class="text-center mb-6">
+        <a href="/" class="inline-flex items-center justify-center p-2.5 rounded-full bg-white shadow-md border border-slate-100 ring-4 ring-emerald-500/10 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:ring-emerald-500/20">
+            <img src="{{ asset('img/logo-smk.svg') }}" alt="Logo SMK Muhammadiyah 12 Jakarta" class="h-16 w-16 object-contain">
+        </a>
+        <h1 class="mt-3 text-lg font-extrabold tracking-tight text-slate-900 leading-snug uppercase">
+            SETEL ULANG PASSWORD
+        </h1>
+    </div>
+
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 

@@ -70,8 +70,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/efisiensi/history/{idAset}', [EfisiensiController::class, 'history'])->name('efisiensi.history');
     });
 
-    // Variabel eksternal - admin
-    Route::middleware('role:admin')->group(function () {
+    // Variabel eksternal - admin and teknisi
+    Route::middleware('role:admin|teknisi')->group(function () {
         Route::get('/variabel-eksternal', [VariabelEksternalController::class, 'index'])->name('variabel.index');
         Route::get('/variabel-eksternal/export/csv', [VariabelEksternalController::class, 'exportCsv'])->name('variabel.export.csv');
         Route::get('/variabel-eksternal/export/excel', [VariabelEksternalController::class, 'exportExcel'])->name('variabel.export.excel');
@@ -87,7 +87,18 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/prediksi-naive-bayes', [PrediksiController::class, 'index'])->name('prediksi.index');
         Route::get('/prediksi-naive-bayes/dataset', [PrediksiController::class, 'datasetIndex'])->name('prediksi.dataset');
+        Route::get('/prediksi-naive-bayes/training', [PrediksiController::class, 'trainingIndex'])->name('prediksi.training');
+        Route::get('/prediksi-naive-bayes/prediksi-kelayakan', [PrediksiController::class, 'predictionPage'])->name('prediksi.kelayakan');
+        Route::get('/prediksi-naive-bayes/asset-history/{id}', [PrediksiController::class, 'getAssetHistory'])->name('prediksi.asset_history');
+        Route::get('/prediksi-naive-bayes/ringkasan', [PrediksiController::class, 'summaryIndex'])->name('prediksi.summary');
+        Route::get('/prediksi-naive-bayes/evaluasi', [PrediksiController::class, 'evaluationIndex'])->name('prediksi.evaluasi');
+        Route::get('/prediksi-naive-bayes/laporan-kelayakan', [PrediksiController::class, 'predictionReport'])->name('prediksi.laporan_kelayakan');
+        Route::get('/prediksi-naive-bayes/dataset-items', [PrediksiController::class, 'getDatasetItems'])->name('prediksi.dataset_items');
+        Route::post('/prediksi-naive-bayes/predict-dataset-item/{id}', [PrediksiController::class, 'predictDatasetItem'])->name('prediksi.predict_dataset_item');
+        Route::post('/prediksi-naive-bayes/predict-all-optimized', [PrediksiController::class, 'predictAllOptimized'])->name('prediksi.predict_all_optimized');
         Route::post('/prediksi-naive-bayes/dataset/generate', [PrediksiController::class, 'generateDataset'])->name('prediksi.dataset.generate');
+        Route::post('/prediksi-naive-bayes/train', [PrediksiController::class, 'trainModel'])->name('prediksi.train');
+        Route::post('/prediksi-naive-bayes/predict', [PrediksiController::class, 'predict'])->name('prediksi.predict');
     });
 
     // Laporan - admin only

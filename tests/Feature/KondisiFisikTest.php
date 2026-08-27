@@ -149,14 +149,45 @@ class KondisiFisikTest extends TestCase
 
     public function test_bisa_melihat_history_kondisi_fisik_per_aset(): void
     {
-        KondisiFisik::factory()->count(5)->create(['id_aset' => $this->asset->id_aset]);
+        // Recent records (within 24h) should be visible
+        KondisiFisik::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
 
         $response = $this->actingAs($this->admin)->get("/kondisi-fisik/history/{$this->asset->id_aset}");
 
         $response->assertStatus(200);
         $response->assertViewIs('kondisi-fisik.history');
         $response->assertViewHas('asset');
-        $response->assertViewHas('rows');
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 3;
+        });
+    }
+
+    public function test_history_kondisi_fisik_hides_expired_records(): void
+    {
+        // Create 2 recent records (within 24h)
+        KondisiFisik::factory()->count(2)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now(),
+        ]);
+
+        // Create 3 expired records (older than 24h)
+        KondisiFisik::factory()->count(3)->create([
+            'id_aset' => $this->asset->id_aset,
+            'created_at' => now()->subHours(25),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/kondisi-fisik/history/{$this->asset->id_aset}");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('rows', function ($rows) {
+            return $rows->count() === 2;
+        });
+
+        // Verify expired records still exist in the database (not deleted)
+        $this->assertDatabaseCount('t_kondisi_fisik', 5);
     }
 
     public function test_bisa_mengambil_data_aset_via_ajax(): void
