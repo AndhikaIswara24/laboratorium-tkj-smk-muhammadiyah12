@@ -17,7 +17,7 @@
     </head>
     <body class="font-sans text-slate-900 antialiased bg-slate-100 min-h-screen flex items-center justify-center p-4">
         <div class="w-full max-w-md my-auto">
-            <div class="bg-white rounded-[32px] border-2 border-slate-900 shadow-2xl p-6 sm:p-8 transition-all">
+            <div class="guest-card bg-white rounded-[32px] border-2 border-slate-900 shadow-2xl p-6 sm:p-8 transition-all">
                 {{ $slot }}
             </div>
         </div>

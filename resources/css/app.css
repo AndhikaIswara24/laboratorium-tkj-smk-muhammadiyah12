@@ -16,9 +16,8 @@
     select,
     option,
     optgroup {
-        color: rgb(15 23 42) !important;
-        -webkit-text-fill-color: rgb(15 23 42) !important;
-        caret-color: rgb(15 23 42) !important;
+        color: rgb(15 23 42);
+        caret-color: rgb(15 23 42);
         @apply placeholder:text-slate-500;
     }
 
@@ -27,19 +26,24 @@
     .dark select,
     .dark option,
     .dark optgroup {
-        color: rgb(248 250 252) !important;
-        -webkit-text-fill-color: rgb(248 250 252) !important;
-        caret-color: rgb(248 250 252) !important;
+        color: rgb(248 250 252);
+        caret-color: rgb(248 250 252);
         @apply placeholder:text-slate-400;
     }
 
     /* Light background container overrides (e.g. login/register cards) */
+    .guest-card input,
+    .guest-card textarea,
+    .guest-card select,
     .bg-white input,
     .bg-slate-50 input,
     .bg-slate-100 input,
-    input.bg-white,
-    input.bg-slate-50,
-    input.bg-slate-100 {
+    .dark .guest-card input,
+    .dark .guest-card textarea,
+    .dark .guest-card select,
+    .dark .bg-white input,
+    .dark .bg-slate-50 input,
+    .dark .bg-slate-100 input {
         color: rgb(15 23 42) !important;
         -webkit-text-fill-color: rgb(15 23 42) !important;
         caret-color: rgb(15 23 42) !important;
@@ -82,10 +86,12 @@
         color: rgb(248 250 252) !important;
     }
 
+    .guest-card input:-webkit-autofill,
     .bg-white input:-webkit-autofill,
     .bg-slate-50 input:-webkit-autofill,
-    input.bg-white:-webkit-autofill,
-    input.bg-slate-50:-webkit-autofill {
+    .dark .guest-card input:-webkit-autofill,
+    .dark .bg-white input:-webkit-autofill,
+    .dark .bg-slate-50 input:-webkit-autofill {
         -webkit-box-shadow: 0 0 0 1000px white inset !important;
         background-color: white !important;
         -webkit-text-fill-color: rgb(15 23 42) !important;
